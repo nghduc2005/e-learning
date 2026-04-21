@@ -1,3 +1,71 @@
-body {
-  color: red;
+#sidebar {
+  width: 64px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Khi rê chuột vào: Mở rộng */
+#sidebar:hover {
+  width: 256px;
+}
+
+/* Ẩn chữ khi thu gọn, hiện khi hover */
+.menu-text {
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+#sidebar:hover .menu-text {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Điều chỉnh nội dung chính để không bị đè */
+.main-content {
+  margin-left: 64px;
+  transition: margin-left 0.3s;
+}
+
+.ql-toolbar.ql-snow, .ql-container.ql-snow {
+  border: none !important;
+}
+
+/* Tùy chỉnh font chữ giống hệ thống của bạn */
+.ql-editor {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Hiệu ứng khi focus vào vùng soạn thảo */
+.quill-wrapper:focus-within {
+  border-color: #4f46e5; /* indigo-600 */
+}
+
+/* Placeholder của Quill */
+.ql-editor.ql-blank::before {
+  color: #9ca3af; /* gray-400 */
+  font-style: normal;
+}
+
+.ql-toolbar.ql-snow {
+  border: none !important;
+  background-color: #f9fafb; /* bg-gray-50 */
+  border-bottom: 1px solid #e5e7eb !important; /* border-gray-200 */
+  padding: 8px 12px !important;
+}
+.ql-container.ql-snow {
+  border: none !important;
+  font-size: 16px;
+}
+
+.sortable-ghost {
+  opacity: 0.4;
+  border: 2px dashed #6366f1 !important;
+}
+
+/* Class khi item đang di chuyển */
+.sortable-chosen {
+  background-color: #f5f7ff;
 }

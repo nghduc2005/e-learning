@@ -9,9 +9,13 @@ const clientRoute = require("./routes/client/index.route")
 //Config dự án
 const app = express()
 const port = 3000
-app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ 
+  limit: '50mb', 
+  extended: true, 
+  parameterLimit: 50000 
+}));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(cookieParser(process.env.SESSION_SECRET));
