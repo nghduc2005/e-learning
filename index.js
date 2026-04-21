@@ -1,9 +1,11 @@
 require('dotenv').config();
 const express = require('express')
+const expressLayouts = require('express-ejs-layouts');
 const path = require("path")
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const indexRoute = require("./routes/index.route")
+const adminRoute = require("./routes/admin/index.route")
+const clientRoute = require("./routes/client/index.route")
 //Config dự án
 const app = express()
 const port = 3000
@@ -23,10 +25,23 @@ app.use(session({
     httpOnly: true
   }
 }));
+//Đăng ký layout
+app.use(expressLayouts)
+app.set("layout extractScripts", true)
+app.set("layout extractStyles", true)
+app.use((req, res, next) => {
+  const url = req.url
+  if(url.startsWith("/admin")) {
+    app.set("layout", "layouts/admin.layouts.ejs")
+  } else {
+    app.set("layout", "layouts/client.layouts.ejs")
+  }
+  next()
+})
 
 //Router
-app.use(indexRoute)
-
+app.use('/admin', adminRoute)
+app.use('/', clientRoute)
 
 app.listen(port, () => {
   console.log(`Đang lắng nghe cổng ${port}`)

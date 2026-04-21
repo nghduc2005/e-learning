@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const courseRoute = require("../routes/course.route")
+const courseRoute = require("./course.route")
 router.use("/", courseRoute)
 
 module.exports = router

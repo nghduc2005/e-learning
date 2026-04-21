@@ -1,4 +1,4 @@
-const { courseController } = require('../controllers/course.controller')
+const { courseController } = require('../../controllers/admin/course.controller')
 
 const router = require('express').Router()
 
