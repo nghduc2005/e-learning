@@ -69,3 +69,16 @@
 .sortable-chosen {
   background-color: #f5f7ff;
 }
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+input[type="radio"]:checked + input[type="text"] {
+  border-color: #4f46e5; /* indigo-600 */
+  background-color: #f5f3ff; /* indigo-50 */
+}

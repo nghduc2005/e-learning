@@ -16,15 +16,11 @@
                 <div class="space-y-1">
                     <label class="flex items-center p-2 rounded-xl hover:bg-indigo-50 group cursor-pointer transition-colors">
                         <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                        <span class="ms-3 text-sm font-medium text-gray-700 group-hover:text-indigo-700">Hoạt động</span>
+                        <span class="ms-3 text-sm font-medium text-gray-700 group-hover:text-indigo-700">Đang mở</span>
                     </label>
                     <label class="flex items-center p-2 rounded-xl hover:bg-indigo-50 group cursor-pointer transition-colors">
                         <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                        <span class="ms-3 text-sm font-medium text-gray-700 group-hover:text-indigo-700">Ẩn</span>
-                    </label>
-                    <label class="flex items-center p-2 rounded-xl hover:bg-indigo-50 group cursor-pointer transition-colors">
-                        <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                        <span class="ms-3 text-sm font-medium text-gray-700 group-hover:text-indigo-700">Khóa</span>
+                        <span class="ms-3 text-sm font-medium text-gray-700 group-hover:text-indigo-700">Bản nháp</span>
                     </label>
                 </div>
             </div>
@@ -58,9 +54,9 @@
     </div>
   </div>
   
-  <%- include("../layouts/components/createButton.ejs", {
-    type: "course"
+  <%- include("../layouts/components/createButton.ejs" , {
+    type: "unit"
   })%>
 </div>
 
-<%- include("../layouts/components/tableCourse.ejs")%>
+<%- include("../layouts/components/tableUnit.ejs")%>
