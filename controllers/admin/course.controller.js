@@ -16,9 +16,12 @@ export const courseController = {
   },
   createPost: (req, res) => {
     console.log(req.body);
-    
+    const bannerUrl = req.file ? req.file.path : null
+    console.log(bannerUrl)
     res.json({
-      ok: true
+      data: {
+        ok: 1
+      }
     })
   }
   

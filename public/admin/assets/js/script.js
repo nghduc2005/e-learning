@@ -33,31 +33,7 @@ if(removeImage) {
   });
 }
 
-const quill = new Quill('#editor', {
-  modules: {
-      toolbar: '#toolbar'
-  },
-  placeholder: 'Mô tả chi tiết khóa học...',
-  theme: 'snow'
-});
 
-  // Xử lý dữ liệu trước khi Submit Form
-  const form = document.querySelector('form');
-  const descriptionInput = document.getElementById('description-input');
-if(form) {
-
-  form.onsubmit = function() {
-      // Lấy nội dung HTML từ Editor
-      const html = quill.root.innerHTML;
-      
-      // Nếu editor trống (chỉ có thẻ p rỗng), có thể xóa giá trị để yêu cầu nhập
-      if (html === '<p><br></p>') {
-          descriptionInput.value = "";
-      } else {
-          descriptionInput.value = html;
-      }
-  };
-}
 
   document.querySelectorAll('.chapter-header').forEach(header => {
     
