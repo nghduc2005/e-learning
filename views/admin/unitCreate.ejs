@@ -6,17 +6,18 @@
 </a>
 </div>
 <div class="relative rounded-2xl overflow-x-auto p-6 bg-gray-50 font-sans">
-<form action="/admin/unit/create" method="POST" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+<form action="/admin/unit/create" id="createUnitForm" method="POST" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
   <div class="p-8 space-y-6">
     <div class="grid grid-cols-2 gap-6 items-end">
     
       <div class="flex flex-col gap-2">
-          <label for="courseName" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
-              Tên khóa học <span class="text-red-600">*</span>
+          <label for="title" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+              Tên chương <span class="text-red-600">*</span>
           </label>
-          <input type="text" id="courseName" name="name" 
+          <input type="text" id="title" name="title" 
               placeholder="Ví dụ: Lập trình C++"
               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400 text-gray-700">
+              <div id="title-error"></div>
       </div>
   
       <div class="flex flex-col gap-2">
@@ -30,6 +31,7 @@
               <option value="locked">Khóa</option>
               <option value="active">Hoạt động</option>
           </select>
+            <div id="status-error"></div>
       </div>
   
   </div>
@@ -76,3 +78,58 @@
   </div>
 </form>
 </div>
+<%- include('../layouts/components/lazyload.ejs')%>
+
+<script>
+        const loadingOverlay = document.getElementById('loadingOverlay');
+    const validation = new JustValidate('#createUnitForm', {
+        errorFieldCssClass: 'border-red-500',
+        errorLabelStyle: {
+            color: '#dc2626',
+            fontSize: '12px',
+            marginTop: '4px'
+        },
+        allowHTMLAnswerErrors: true,
+        shouldAddErrorClasses: true,
+        refreshValuesOnValidation: true,
+        lockForm: true
+    });
+    const createCourseForm = document.getElementById("createCourseForm")
+    validation
+        .addField('#title', [
+            { rule: 'required', errorMessage: 'Tên chương không được để trống' },
+        ], {
+            errorsContainer: '#title-error'
+        })
+        .addField('#status', [
+            {
+            rule: 'required',
+            errorMessage: 'Vui lòng chọn trạng thái chương',
+            },
+        ], {
+            errorsContainer: '#status-error'
+        })
+        .onFail((fields) => {
+            console.clear(); // Xóa log cũ trước khi hiện log mới
+        })
+        .onSuccess(async (event) => {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form)
+            const finalData = {
+                title: formData.get("title"),
+                status: formData.get("status")
+            }
+            loadingOverlay.classList.remove('hidden');
+            try {
+                const response = await axios.post("/admin/unit/create", finalData)
+                console.log(response.data);
+                
+            } catch (error) {
+                console.error('Lỗi khi gửi dữ liệu:', error);
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+        });
+</script>

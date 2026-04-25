@@ -6,30 +6,31 @@
 </a>
 </div>
 <div class="relative rounded-2xl overflow-x-auto p-6 bg-gray-50 font-sans">
-  <form action="/admin/lesson/create" method="POST" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <form action="/admin/lesson/create" id="createLessonForm" method="POST" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="p-8 space-y-6">
       <div class="grid grid-cols-2 gap-6 items-end">
-      
-        <div class="flex flex-col gap-2">
-            <label for="lessonName" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                Tên bài học <span class="text-red-600">*</span>
-            </label>
-            <input type="text" id="lessonName" name="name" 
-                placeholder="Ví dụ: Lập trình C++"
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400 text-gray-700">
-        </div>
-    
-        <div class="flex flex-col gap-2">
-            <label for="status" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                Trạng thái <span class="text-red-600">*</span>
-            </label>
-            <select id="status" name="status" 
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
-                style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%236b7280%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E');">
-                <option value="hidden">Ẩn</option>
-                <option value="locked">Khóa</option>
-                <option value="active">Hoạt động</option>
-            </select>
+        <div class="grid grid-cols-2 col-span-2 gap-6 items-start mt-6">
+            <div class="flex flex-col gap-2">
+                <label for="title" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                    Tên bài học <span class="text-red-600">*</span>
+                </label>
+                <input type="text" id="title" name="title" 
+                    placeholder="Ví dụ: Lập trình C++"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400 text-gray-700">
+            </div>
+        
+            <div class="flex flex-col gap-2">
+                <label for="status" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                    Trạng thái <span class="text-red-600">*</span>
+                </label>
+                <select id="status" name="status" 
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                    style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%236b7280%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E');">
+                    <option value="hidden">Ẩn</option>
+                    <option value="locked">Khóa</option>
+                    <option value="active">Hoạt động</option>
+                </select>
+            </div>
         </div>
         <div class="grid grid-cols-2 col-span-2 gap-6 items-start mt-6">
           <div class="flex flex-col gap-2">
@@ -48,14 +49,14 @@
           </div>
       
           <div class="flex flex-col gap-2">
-              <label id="fileLabel" for="lessonContent" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+              <label id="fileLabel" for="content" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
                   Video bài giảng <span class="text-red-600">*</span>
               </label>
               <div class="relative">
-                  <input type="file" id="lessonContent" name="lessonFile" accept="video/*" 
+                  <input type="file" id="content" name="content" accept="video/*" 
                       class="hidden" onchange="handleFileSelect(this)">
                   
-                  <label for="lessonContent" 
+                  <label for="content" 
                       class="flex items-center justify-between w-full px-4 py-3 rounded-xl border-2 border-dashed border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 cursor-pointer transition-all group">
                       
                       <div class="flex items-center overflow-hidden">
@@ -74,27 +75,26 @@
           </div>
       </div>
         <div class="grid grid-cols-2 col-span-2 gap-6 items-start mt-6">
-          <div class="flex flex-col gap-2">
-            <label for="priceRange" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                Điểm đỗ <span class="text-red-600">*</span>
-            </label>
-            <div class="relative">
-                <select id="priceRange" name="value" 
-                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
-                    style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%236b7280%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E');">
-                    <% for(let i = 0; i <= 10; i++) { %>
-                        <option value="<%= i*10 %>"><%= i*10 %></option>
-                    <% } %>
-                </select>
+            <div class="flex flex-col gap-2">
+                <label for="score" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+                    Số câu hỏi cần đạt <span class="text-red-600">*</span>
+                </label>
+                <div class="relative">
+                    <select id="score" name="score" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
+                        style="background-image: url('data:image/svg+xml;charset=utf-8,...');">
+                        <option value="0">0 câu hỏi</option>
+                    </select>
+                </div>
+                <p class="text-[11px] text-gray-400 ml-1 italic">* Học viên cần trả lời đúng ít nhất số câu này để qua bài học.</p>
             </div>
-        </div>
           <div class="flex flex-col gap-2">
-              <label for="lessonFile" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
+              <label for="document" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
                   Tài liệu bài học (Docx, PDF)
               </label>
               <div class="relative">
-                  <input type="file" id="lessonFile" name="document" accept=".pdf,.docx" class="hidden" onchange="updateFileName(this)">
-                  <label for="lessonFile" class="flex items-center justify-between w-full px-4 py-3 rounded-xl border-2 border-dashed border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 cursor-pointer transition-all group">
+                  <input type="file" id="document" multiple name="document" accept=".pdf,.docx" class="hidden" onchange="updateFileName(this)">
+                  <label for="document" class="flex items-center justify-between w-full px-4 py-3 rounded-xl border-2 border-dashed border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 cursor-pointer transition-all group">
                       <div class="flex items-center overflow-hidden">
                           <svg class="w-6 h-6 text-gray-400 group-hover:text-indigo-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
@@ -104,7 +104,8 @@
                       <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-lg uppercase shrink-0">Chọn</span>
                   </label>
               </div>
-              <p class="text-[11px] text-gray-400 ml-1 italic">* File tối đa 10MB</p>
+              <p class="text-[11px] text-gray-400 ml-1 italic">* Tối đa 3 file mỗi file tối đa 10MB</p>
+              <div id="fileListContainer" class="mt-3 space-y-2"></div>
           </div>
       
           
@@ -173,22 +174,49 @@
     </div>
   </form>
   </div>
+    <%- include('../layouts/components/lazyload.ejs')%>
 
   <script>
+    const createLessonForm = document.getElementById("createLessonForm")
     function updateFileName(input) {
         const display = document.getElementById('fileNameDisplay');
-        if (input.files && input.files.length > 0) {
-            display.innerText = input.files[0].name;
-            display.classList.remove('text-gray-400', 'italic');
+        const listContainer = document.getElementById('fileListContainer');
+        const files = input.files;
+
+        // Reset vùng hiển thị danh sách
+        listContainer.innerHTML = '';
+
+        if (files && files.length > 0) {
+            // 1. Cập nhật chữ hiển thị chính
+            display.classList.remove('italic');
             display.classList.add('text-gray-900', 'font-medium');
+            display.innerText = `${files.length} file đã được chọn`;
+
+            // 2. Tạo danh sách tên file bên dưới
+            Array.from(files).forEach((file, index) => {
+                const fileRow = document.createElement('div');
+                fileRow.className = "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 animate-fadeIn";
+                
+                // Icon và tên file
+                fileRow.innerHTML = `
+                    <div class="flex items-center overflow-hidden">
+                        <svg class="w-4 h-4 text-indigo-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span class="text-xs text-gray-600 truncate">${file.name}</span>
+                    </div>
+                    <span class="text-[10px] text-gray-400">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                `;
+                listContainer.appendChild(fileRow);
+            });
         } else {
-            display.innerText = "Chưa có file nào được chọn...";
-            display.classList.add('text-gray-400', 'italic');
-            display.classList.remove('text-gray-900', 'font-medium');
+            // Nếu không có file
+            display.classList.add('italic');
+            display.innerText = "Chưa chọn file...";
         }
     }
     function toggleUploadMode(mode) {
-        const fileInput = document.getElementById('lessonContent');
+        const fileInput = document.getElementById('content');
         const fileLabel = document.getElementById('fileLabel');
         const fileHint = document.getElementById('fileHint');
         const fileIcon = document.getElementById('fileIcon');
@@ -237,72 +265,241 @@
       const questionDiv = document.createElement('div');
       questionDiv.className = "w-full flex flex-col gap-4 p-6 bg-gray-50 border border-gray-100 rounded-2xl relative animate-fade-in mb-4";
       questionDiv.id = `question-block-${questionCount}`;
-
+      const qId = `#q-input-${questionCount}`;
+      const ansGroupName = `correctAnswer[${questionCount}]`;
+      const errorAnswersId = `error-answers-${questionCount}`;
+      const errorCorrectId = `error-correct-${questionCount}`;
       questionDiv.innerHTML = `
-          <div class="flex items-center justify-between border-b border-gray-200 pb-3">
-              <span class="text-xs font-black text-indigo-500 uppercase tracking-widest">Câu hỏi số ${questionCount}</span>
-              <button type="button" onclick="removeQuestion(${questionCount})" 
-                  class="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                  </svg>
-              </button>
-          </div>
-          
-          <div class="flex flex-col gap-2">
-              <input type="text" name="questions[]" 
-                  placeholder="Nhập nội dung câu hỏi..."
-                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 bg-white">
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="relative flex items-center">
-                <input type="text" name="answers[${questionCount}][]" placeholder="Đáp án A" 
-                    class="w-full pl-12 pr-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:border-indigo-300 transition-all">
-                <label class="absolute left-3 flex items-center cursor-pointer">
-                    <input type="radio" name="correctAnswer[${questionCount}]" value="0" 
-                        class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
-                </label>
-            </div>
-
-            <div class="relative flex items-center">
-                <input type="text" name="answers[${questionCount}][]" placeholder="Đáp án B" 
-                    class="w-full pl-12 pr-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:border-indigo-300 transition-all">
-                <label class="absolute left-3 flex items-center cursor-pointer">
-                    <input type="radio" name="correctAnswer[${questionCount}]" value="1" 
-                        class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
-                </label>
-            </div>
-
-            <div class="relative flex items-center">
-                <input type="text" name="answers[${questionCount}][]" placeholder="Đáp án C" 
-                    class="w-full pl-12 pr-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:border-indigo-300 transition-all">
-                <label class="absolute left-3 flex items-center cursor-pointer">
-                    <input type="radio" name="correctAnswer[${questionCount}]" value="2" 
-                        class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
-                </label>
-            </div>
-
-            <div class="relative flex items-center">
-                <input type="text" name="answers[${questionCount}][]" placeholder="Đáp án D" 
-                    class="w-full pl-12 pr-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:border-indigo-300 transition-all">
-                <label class="absolute left-3 flex items-center cursor-pointer">
-                    <input type="radio" name="correctAnswer[${questionCount}]" value="3" 
-                        class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
-                </label>
-            </div>
+        <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+            <span class="text-xs font-black text-indigo-500 uppercase tracking-widest">Câu hỏi số ${questionCount}</span>
+            <button type="button" onclick="removeQuestion(${questionCount})" class="p-1 text-gray-400 hover:text-red-500 rounded-lg transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>
         </div>
-        <p class="text-[11px] text-indigo-500 mt-2 italic">
-      `;
+        <div class="flex flex-col gap-2">
+            <input type="text" name="questions[]" id="q-input-${questionCount}" placeholder="Nhập nội dung câu hỏi..."
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 outline-none transition-all text-gray-700 bg-white">
+        </div>
+        <div id="ans-group-${questionCount}" class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 rounded-xl transition-all">
+            ${[0, 1, 2, 3].map(i => `
+                <div class="relative flex items-center">
+                    <input type="text" name="answers[${questionCount}][]" id="ans-${questionCount}-${i}" placeholder="Đáp án ${String.fromCharCode(65 + i)}" 
+                        class="answer-input-${questionCount} w-full pl-12 pr-4 py-2.5 rounded-lg border border-gray-200 outline-none focus:border-indigo-300 transition-all">
+                    <label class="absolute left-3 flex items-center cursor-pointer">
+                        <input type="radio" name="${ansGroupName}" value="${i}" class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer">
+                    </label>
+                </div>
+            `).join('')}
+        </div>
+        <div id="${errorAnswersId}" class="text-xs text-red-600 mt-1"></div>
+        <div id="${errorCorrectId}" class="text-xs text-red-600 mt-1"></div>
+    `;
 
       container.appendChild(questionDiv);
+      updateScoreOptions()
+      validation.addField(qId, [
+        { rule: 'required', errorMessage: 'Nội dung câu hỏi không được để trống' },
+        { rule: 'minLength', value: 5, errorMessage: 'Câu hỏi phải có ít nhất 5 ký tự' }
+    ]);
+
+    for (let i = 0; i < 4; i++) {
+        validation.addField(`#ans-${questionCount}-0`, [
+        {
+            validator: () => {
+                const inputs = document.querySelectorAll(`.answer-input-${questionCount}`);
+                const allFilled = Array.from(inputs).every(input => input.value.trim() !== "");
+                inputs.forEach(input => {
+                    if (!allFilled) {
+                        input.classList.add('border-red-500', 'bg-red-50');
+                    } else {
+                        input.classList.remove('border-red-500', 'bg-red-50');
+                    }
+                });
+                return allFilled;
+            },
+            errorMessage: 'Vui lòng nhập đầy đủ 4 đáp án'
+        }
+    ], {
+        errorsContainer: `#error-answers-${questionCount}`
+    });
+    }
+
+    validation.addRequiredGroup(
+        `input[name="${ansGroupName}"]`,
+        'Vui lòng chọn một đáp án đúng cho câu hỏi này',
+        {
+        errorsContainer: `#error-correct-${questionCount}`
+    }
+    );
   }
 
     function removeQuestion(id) {
         const element = document.getElementById(`question-block-${id}`);
         if (element) {
-            element.classList.add('opacity-0', 'scale-95'); // Hiệu ứng biến mất
+            validation.removeField(`#q-input-${id}`);
+            for (let i = 0; i < 4; i++) {
+                validation.removeField(`#ans-${id}-${i}`);
+            }
+            validation.removeGroup(`input[name="correctAnswer[${id}]"]`);
+            element.classList.add('opacity-0', 'scale-95');
             setTimeout(() => element.remove(), 200);
         }
     }
+
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const validation = new JustValidate('#createLessonForm', {
+        errorFieldCssClass: 'border-red-500',
+        errorLabelStyle: {
+            color: '#dc2626',
+            fontSize: '12px',
+            marginTop: '4px'
+        },
+        allowHTMLAnswerErrors: true,
+        shouldAddErrorClasses: true,
+        refreshValuesOnValidation: true,
+        lockForm: true
+    });
+
+    function updateScoreOptions() {
+        const scoreSelect = document.getElementById('score');
+        const totalQuestions = document.querySelectorAll('[id^="question-block-"]').length;
+        const currentSelected = parseInt(scoreSelect.value) || 0;
+
+        scoreSelect.innerHTML = '';
+
+        for (let i = 0; i <= totalQuestions; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.text = i === 0 ? "0 câu hỏi" : `${i} câu hỏi`;
+            scoreSelect.appendChild(option);
+        }
+
+        if (currentSelected <= totalQuestions) {
+            scoreSelect.value = currentSelected;
+        } else {
+            scoreSelect.value = totalQuestions;
+        }
+    }
+    validation
+        .addField('#title', [
+        { rule: 'required', errorMessage: 'Vui lòng nhập tên bài học' },
+        { rule: 'minLength', value: 3, errorMessage: 'Tên bài học phải ít nhất 3 ký tự' },
+        { rule: 'maxLength', value: 256, errorMessage: 'Tên bài học quá dài' },
+        ])
+
+        // 2. Validate Trạng thái
+        .addField('#status', [
+        { rule: 'required', errorMessage: 'Vui lòng chọn trạng thái' },
+        ])
+
+        .addField('#content', [
+            {
+                validator: (value, fields) => {
+                    const fileInput = document.getElementById('content');
+                    const file = fileInput.files[0];
+                    if (!file) return false;
+
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    const mode = document.getElementById('learnMode').value;
+
+                    if (mode === 'video') {
+                        const videoExtensions = ['mp4', 'webm', 'mov'];
+                        return videoExtensions.includes(extension) && file.size <= 50 * 1024 * 1024;
+                    } 
+                    
+                    if (mode === 'article') {
+                        const docExtensions = ['pdf', 'docx'];
+                        return docExtensions.includes(extension) && file.size <= 10 * 1024 * 1024;
+                    }
+                    return false;
+                },
+                errorMessage: 'File không tồn tại hoặc không đúng theo định dạng/dung lượng khuyến nghị!',
+            }
+            ])
+        .addField('#score', [
+            { rule: 'required', errorMessage: 'Vui lòng chọn số câu hỏi cần đạt' },
+            {
+                validator: (value) => {
+                    const numRequired = parseInt(value);
+                    const actualQuestions = document.querySelectorAll('[id^="question-block-"]').length;
+                    
+                    if (numRequired > 0 && actualQuestions === 0) return false;
+                    
+                    return numRequired <= actualQuestions;
+                },
+                errorMessage: 'Số câu hỏi cần đạt không hợp lệ so với tổng số câu hỏi'
+            }
+        ])
+        .addField('#document', [
+            {
+                validator: (files) => {
+                if (!files || files.length === 0) return true;
+                if(files.length >3) {
+                    return false;
+                }
+                const allowedExts = ['pdf', 'docx'];
+                const maxSize = 10485760;
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    if (!allowedExts.includes(extension) || file.size > maxSize) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            errorMessage: 'Tối đa 3 file PDF/Docx và không quá 10MB/file',
+            }
+        ])
+        .onFail((fields) => {
+            console.clear(); // Xóa log cũ trước khi hiện log mới
+        })
+        .onSuccess(async (event) => {
+            event.preventDefault();
+            const form = event.target;
+            console.log(form);
+            
+            const formData = new FormData(form);
+            const questionBlocks = document.querySelectorAll('[id^="question-block-"]');
+            const questionsList = [];
+
+            questionBlocks.forEach((block) => {
+                const blockId = block.id.replace('question-block-', '');
+                
+                const content = block.querySelector('input[name="questions[]"]').value;
+                
+                const answerInputs = block.querySelectorAll(`input[name="answers[${blockId}][]"]`);
+                const answers = Array.from(answerInputs).map(input => input.value);
+                
+                const correctRadio = block.querySelector(`input[name="correctAnswer[${blockId}:checked]`);
+                const correctAnswer = correctRadio ? parseInt(correctRadio.value) : 0;
+
+                questionsList.push({ content, answers, correctAnswer });
+            });
+
+            formData.append('questionsList', JSON.stringify(questionsList));
+            formData.delete('questions[]');
+            const keysToDelete = [];
+            for (let key of formData.keys()) {
+                if (key.startsWith('answers') || key.startsWith('correctAnswer')) {
+                    keysToDelete.push(key);
+                }
+            }
+            keysToDelete.forEach(key => formData.delete(key));
+            loadingOverlay.classList.remove('hidden');
+            try {
+                const response = await axios.post("/admin/lesson/create", formData)
+                console.log(response.data);
+                
+            } catch (error) {
+                console.error('Lỗi khi gửi dữ liệu:', error);
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+            
+        });
+    
+
 </script>

@@ -82,3 +82,17 @@ input[type="radio"]:checked + input[type="text"] {
   border-color: #4f46e5; /* indigo-600 */
   background-color: #f5f3ff; /* indigo-50 */
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.just-validate-error-label {
+  font-style: italic;
+  margin-bottom: 4px;
+  display: block;
+}

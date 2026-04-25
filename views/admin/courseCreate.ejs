@@ -10,8 +10,8 @@
       <div class="p-8 space-y-6">
           
           <div class="grid grid-cols-1 gap-2">
-              <label for="courseName" class="text-sm font-bold text-gray-700 uppercase tracking-wider">Tên khóa học <span class="text-red-600">*</span></label>
-              <input type="text" id="courseName" name="name" 
+              <label for="title" class="text-sm font-bold text-gray-700 uppercase tracking-wider">Tên khóa học <span class="text-red-600">*</span></label>
+              <input type="text" id="title" name="title" 
                   placeholder="Ví dụ: Lập trình C++"
                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400 text-gray-700">
             <div id="title-error"></div>
@@ -33,7 +33,7 @@
               <div class="grid grid-cols-1">
                 <label class="text-sm font-bold text-gray-700 uppercase tracking-wider">Banner khóa học</label>
                 <div class="relative group">
-                    <input type="file" id="imageInput" name="banner" accept="image/*"
+                    <input type="file" id="banner" name="banner" accept="image/*"
                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                     
                     <div id="dropzoneContent" class="w-full px-4 py-3 rounded-xl border border-dashed border-gray-300 group-hover:border-indigo-400 group-hover:bg-indigo-50 transition-all flex items-center justify-center text-gray-500">
@@ -48,7 +48,7 @@
                       </button>
                   </div>
                 </div>
-                <div id="image-error"></div>
+                <div id="banner-error"></div>
             </div>
 
             <div class="grid grid-cols-1 gap-2 md:col-span-2">
@@ -78,7 +78,7 @@
                       <p></p>
                   </div>
               </div>
-              <input type="hidden" name="description" id="description-input">
+              <input type="hidden" name="description" id="description">
               <div id="description-error"></div>
           </div>
       </div>
@@ -125,7 +125,7 @@
       </div>
   </form>
 </div>
-
+<%- include('../layouts/components/lazyload.ejs')%>
 <script>
     const loadingOverlay = document.getElementById('loadingOverlay');
     const validation = new JustValidate('#createCourseForm', {
@@ -149,7 +149,7 @@
     });
     const createCourseForm = document.getElementById("createCourseForm")
     validation
-        .addField('#courseName', [
+        .addField('#title', [
             { rule: 'required', errorMessage: 'Tên khóa học không được để trống' },
         ], {
             errorsContainer: '#title-error'
@@ -162,7 +162,7 @@
         ], {
             errorsContainer: '#status-error'
         })
-        .addField('#imageInput', [
+        .addField('#banner', [
             {
             rule: 'files',
             value: {
@@ -175,13 +175,13 @@
             errorMessage: 'File phải là ảnh (jpg, png, webp) và nhỏ hơn 2MB',
             },
         ], {
-            errorsContainer: '#image-error'
+            errorsContainer: '#banner-error'
         })
-        .addField('#description-input', [
+        .addField('#description', [
             {
                 validator: (value) => {
                     const html = quill.root.innerHTML;
-                    const descriptionInput = document.querySelector('#description-input');
+                    const descriptionInput = document.querySelector('#description');
                     if (html === '<p><br></p>') {
                         descriptionInput.value = "";
                     } else {
@@ -200,6 +200,8 @@
         .onSuccess(async (event) => {
             event.preventDefault();
             const form = event.target;
+            console.log(form);
+            
             const formData = new FormData(form);
             loadingOverlay.classList.remove('hidden');
             try {

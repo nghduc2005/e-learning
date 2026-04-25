@@ -4,30 +4,33 @@ const multer = require('multer');
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'course-banner',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'], 
-    transformation: [
-      { width: 1000, height: 1000, crop: 'limit' }, // giới hạn kích thước
-      { quality: 'auto' }, // tự động nén để giảm dung lượng
-      { fetch_format: 'auto' } // tự động chọn định dạng tốt nhất
-    ],
+  params: async (req, file) => {
+      let folder = 'others';
+      const extension = file.originalname.split('.').pop().toLowerCase();
+      
+      if (file.mimetype.startsWith('image/')) {
+          folder = 'images';
+      } else if (file.mimetype.startsWith('video/')) {
+          folder = 'videos';
+      } else if (
+          file.mimetype === 'application/pdf' || 
+          file.mimetype.includes('word') || 
+          ['pdf', 'docx', 'doc'].includes(extension)
+      ) {
+          folder = 'documents';
+      }
+      return {
+        folder: `e-learning/${folder}`, 
+        resource_type: 'auto', 
+        public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
+        flags: "attachment"
+      };
   },
 });
 
-const upload = multer({ 
-  storage: storage,
-  limits: { 
-    fileSize: 2 * 1024 * 1024
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Định dạng file không hợp lệ!'), false);
-    }
-  }
+const uploadCloud = multer({ 
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 } // Giới hạn 50MB cho video
 });
 
-module.exports = upload;
+module.exports = uploadCloud;

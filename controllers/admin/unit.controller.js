@@ -8,6 +8,14 @@ const unitController = {
     res.render("admin/unitCreate", {
       title: "Tạo chương"
     })
+  },
+  createPost: (req, res) => {
+    console.log(req.body);
+    res.json({
+      data: {
+        ok: 1
+      }
+    })
   }
 }
 
