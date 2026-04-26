@@ -96,3 +96,20 @@ input[type="radio"]:checked + input[type="text"] {
   margin-bottom: 4px;
   display: block;
 }
+
+/* Đảm bảo thẻ lỗi luôn nằm dưới cùng và không đẩy radio */
+.just-validate-error-label {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 4px;
+  margin-left: 4px; /* Căn lề cho đẹp với input */
+  font-size: 11px;
+  line-height: 1;
+  order: 2; /* Đảm bảo luôn nằm sau các phần tử khác trong flex-col */
+}
+
+/* Giữ cho Input Wrapper luôn ổn định */
+.relative.flex.items-center {
+  order: 1;
+  z-index: 10;
+}

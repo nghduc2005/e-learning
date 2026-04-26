@@ -1,10 +1,15 @@
-const unitController  = require('../../controllers/admin/unit.controller')
-const { validate, unitSchema } = require('../../middlewares/validate.middleware')
+import unitController from '../../controllers/admin/unit.controller.js'
+import { validate, unitSchema } from '../../middlewares/validate.middleware.js'
+import express from 'express'
 
-const router = require('express').Router()
+const router = express.Router()
 
 router.get("/list", unitController.list)
 router.get("/create", unitController.create)
 router.post("/create", validate(unitSchema), unitController.createPost)
+router.get("/edit/:id", unitController.edit)
+router.post("/edit/:id", validate(unitSchema), unitController.editPost)
+router.post("/delete/:id", unitController.delete)
+router.post("/restore/:id", unitController.restore)
 
-module.exports = router
+export default router

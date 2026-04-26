@@ -1,12 +1,12 @@
 <div class="flex items-center justify-between mb-8">
-  <p class="text-sm text-gray-500 mt-1">Vui lòng điền các thông tin để tạo bài học.</p>
+  <p class="text-sm text-gray-500 mt-1">Vui lòng điền các thông tin để cập nhật bài học.</p>
 <a href="/admin/lesson/list" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center transition-colors">
   <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
   Quay lại danh sách
 </a>
 </div>
 <div class="relative rounded-2xl overflow-x-auto p-6 bg-gray-50 font-sans">
-  <form action="/admin/lesson/create" id="createLessonForm" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <form action="/admin/lesson/edit/<%= lesson.id %>" id="editLessonForm" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="p-8 space-y-6">
       <div class="grid grid-cols-2 gap-6 items-end">
         <div class="grid grid-cols-2 col-span-2 gap-6 items-start mt-6">
@@ -14,7 +14,7 @@
                 <label for="title" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
                     Tên bài học <span class="text-red-600">*</span>
                 </label>
-                <input type="text" id="title" name="title" 
+                <input type="text" id="title" name="title" value="<%= lesson.name %>"
                     placeholder="Ví dụ: Lập trình C++"
                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400 text-gray-700">
             </div>
@@ -26,9 +26,9 @@
                 <select id="status" name="status" 
                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
                     style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%236b7280%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E');">
-                    <option value="hidden">Ẩn</option>
-                    <option value="locked">Khóa</option>
-                    <option value="active">Hoạt động</option>
+                    <option value="hidden" <%= lesson.status === 'hidden' ? 'selected' : '' %>>Ẩn</option>
+                    <option value="locked" <%= lesson.status === 'locked' ? 'selected' : '' %>>Khóa</option>
+                    <option value="active" <%= lesson.status === 'active' ? 'selected' : '' %>>Hoạt động</option>
                 </select>
             </div>
         </div>
@@ -41,8 +41,8 @@
                   <select id="learnMode" name="learnMode" onchange="toggleUploadMode(this.value)"
                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
                       style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%236b7280%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E');">
-                      <option value="video">Học qua Video</option>
-                      <option value="article">Học qua Bài viết (PDF/Docx)</option>
+                      <option value="video" <%= lesson.learnMode === 'video' ? 'selected' : '' %>>Học qua Video</option>
+                      <option value="article" <%= lesson.learnMode === 'article' ? 'selected' : '' %>>Học qua Bài viết (PDF/Docx)</option>
                   </select>
               </div>
               <p class="text-[11px] text-gray-400 ml-1 italic">Chọn định dạng tài liệu học của bài chính.</p>
@@ -50,10 +50,10 @@
       
           <div class="flex flex-col gap-2">
               <label id="fileLabel" for="content" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                  Video bài giảng <span class="text-red-600">*</span>
+                  <%= lesson.learnMode === 'video' ? 'Video bài giảng' : 'Tài liệu bài giảng' %>
               </label>
               <div class="relative">
-                  <input type="file" id="content" name="content" accept="video/*" 
+                  <input type="file" id="content" name="content" <%= lesson.learnMode === 'video' ? 'accept="video/*"' : 'accept=".pdf,.docx"' %>
                       class="hidden" onchange="handleFileSelect(this)">
                   
                   <label for="content" 
@@ -61,17 +61,17 @@
                       
                       <div class="flex items-center overflow-hidden">
                           <div id="fileIcon">
-                              <svg class="w-6 h-6 text-gray-400 group-hover:text-indigo-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                              <svg class="w-6 h-6 text-indigo-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                               </svg>
                           </div>
-                          <span id="contentFileName" class="text-gray-400 group-hover:text-gray-600 italic truncate">Chưa có file nào...</span>
+                          <span id="contentFileName" class="text-gray-900 font-medium truncate" data-initial-content="<%= lesson.content %>">Đã có tài liệu lưu trữ (Chọn để đổi)</span>
                       </div>
                       
                       <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-lg uppercase shrink-0">Tải lên</span>
                   </label>
               </div>
-              <p id="fileHint" class="text-[11px] text-gray-400 ml-1 italic">* Hỗ trợ: MP4, WebM, MOV (Tối đa 50MB)</p>
+              <p id="fileHint" class="text-[11px] text-gray-400 ml-1 italic">* Không bắt buộc tải lại file nếu muốn giữ file cũ.</p>
           </div>
       </div>
         <div class="grid grid-cols-2 col-span-2 gap-6 items-start mt-6">
@@ -80,7 +80,7 @@
                     Số câu hỏi cần đạt <span class="text-red-600">*</span>
                 </label>
                 <div class="relative">
-                    <select id="score" name="score" 
+                    <select id="score" name="score" data-initial-score="<%= lesson.passScore %>"
                         class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
                         style="background-image: url('data:image/svg+xml;charset=utf-8,...');">
                         <option value="0">0 câu hỏi</option>
@@ -90,7 +90,7 @@
             </div>
           <div class="flex flex-col gap-2">
               <label for="document" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
-                  Tài liệu bài học (Docx, PDF)
+                  Tài liệu bài học đính kèm (Docx, PDF)
               </label>
               <div class="relative">
                   <input type="file" id="document" multiple name="document" accept=".pdf,.docx" class="hidden" onchange="updateFileName(this)">
@@ -99,7 +99,8 @@
                           <svg class="w-6 h-6 text-gray-400 group-hover:text-indigo-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                           </svg>
-                          <span id="fileNameDisplay" class="text-gray-400 group-hover:text-gray-600 italic truncate">Chưa chọn file...</span>
+                          <% const docArr = lesson.document ? JSON.parse(lesson.document) : []; %>
+                          <span id="fileNameDisplay" class="text-gray-900 font-medium truncate"><%= docArr.length > 0 ? `Đã có ${docArr.length} file đính kèm (Chọn để đổi mới)` : 'Chưa chọn file...' %></span>
                       </div>
                       <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-3 py-1 rounded-lg uppercase shrink-0">Chọn</span>
                   </label>
@@ -169,11 +170,15 @@
     </div>
         <button type="submit" 
             class="inline-flex items-center px-8 py-2.5 text-sm font-bold text-center text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 shadow-lg shadow-indigo-100 transform active:scale-95 transition-all">
-            Lưu bài học
+            Cập nhật bài học
         </button>
     </div>
   </form>
   </div>
     <%- include('../layouts/components/lazyload.ejs')%>
 
-  <script src="/admin/assets/js/lessonCreate.js"></script>
+  <script>
+      window.initialQuestions = <%- JSON.stringify(lesson.questionsList || []) %>;
+      window.editLessonId = <%= lesson.id %>;
+  </script>
+  <script src="/admin/assets/js/lessonEdit.js"></script>

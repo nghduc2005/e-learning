@@ -1,4 +1,4 @@
-const imageInput = document.getElementById('imageInput');
+const imageInput = document.getElementById('banner');
 const imagePreview = document.getElementById('imagePreview');
 const previewContainer = document.getElementById('previewContainer');
 const dropzoneContent = document.getElementById('dropzoneContent');

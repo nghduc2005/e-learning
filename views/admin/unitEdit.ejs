@@ -1,12 +1,12 @@
 <div class="flex items-center justify-between mb-8">
-  <p class="text-sm text-gray-500 mt-1">Vui lòng điền đầy đủ các thông tin để tạo chương.</p>
+  <p class="text-sm text-gray-500 mt-1">Vui lòng điền đầy đủ các thông tin để cập nhật chương.</p>
 <a href="/admin/unit/list" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center transition-colors">
   <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
   Quay lại danh sách
 </a>
 </div>
 <div class="relative rounded-2xl overflow-x-auto p-6 bg-gray-50 font-sans">
-<form action="/admin/unit/create" id="createUnitForm" method="POST" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+<form action="/admin/unit/edit/<%=unit.id%>" id="editUnitForm" method="POST" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
   <div class="p-8 space-y-6">
     <div class="grid grid-cols-2 gap-6 items-end">
     
@@ -14,7 +14,7 @@
           <label for="title" class="text-sm font-bold text-gray-700 uppercase tracking-wider">
               Tên chương <span class="text-red-600">*</span>
           </label>
-          <input type="text" id="title" name="title" 
+          <input type="text" id="title" name="title" value="<%=unit.name%>"
               placeholder="Ví dụ: Lập trình C++"
               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all placeholder:text-gray-400 text-gray-700">
               <div id="title-error"></div>
@@ -27,9 +27,9 @@
           <select id="status" name="status" 
               class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
               style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%236b7280%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E');">
-              <option value="hidden">Ẩn</option>
-              <option value="locked">Khóa</option>
-              <option value="active">Đang hoạt động</option>
+              <option value="hidden" <%= unit.status === 'hidden' ? 'selected' : '' %>>Ẩn</option>
+              <option value="locked" <%= unit.status === 'locked' ? 'selected' : '' %>>Khóa</option>
+              <option value="active" <%= unit.status === 'active' ? 'selected' : '' %>>Đang hoạt động</option>
           </select>
             <div id="status-error"></div>
       </div>
@@ -57,7 +57,7 @@
                       </svg>
                   </div>
                   <h3 class="mb-2 text-lg font-bold text-gray-900">Xác nhận hủy?</h3>
-                  <p class="mb-6 text-sm text-gray-500">Mọi thông tin bạn vừa nhập sẽ không được lưu lại. Bạn có chắc chắn muốn quay lại danh sách?</p>
+                  <p class="mb-6 text-sm text-gray-500">Mọi thông tin bạn vừa sửa sẽ không được lưu lại. Bạn có chắc chắn muốn quay lại danh sách?</p>
                   
                   <div class="flex items-center space-x-3 justify-center">
                       <a href="/admin/unit/list" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-xl text-sm inline-flex items-center px-5 py-2.5 text-center transition-all">
@@ -73,11 +73,11 @@
   </div>
       <button type="submit" 
           class="inline-flex items-center px-8 py-2.5 text-sm font-bold text-center text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 shadow-lg shadow-indigo-100 transform active:scale-95 transition-all">
-          Lưu chương
+          Cập nhật chương
       </button>
   </div>
 </form>
 </div>
 <%- include('../layouts/components/lazyload.ejs')%>
 
-<script src="/admin/assets/js/unitCreate.js"></script>
+<script src="/admin/assets/js/unitEdit.js"></script>
