@@ -77,8 +77,9 @@ const loadingOverlay = document.getElementById('loadingOverlay');
             loadingOverlay.classList.remove('hidden');
             try {
                 const response = await axios.post("/admin/course/create", formData)
-                console.log(response.data);
-                
+                if (response.data.data.ok) {
+                    if (window.opener) { window.close(); } else { window.history.back(); }
+                }
             } catch (error) {
                 console.error('Lỗi khi gửi dữ liệu:', error);
             } finally {

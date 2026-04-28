@@ -1,4 +1,4 @@
-export const unitDto = {
+const unitDto = {
   unitView: (unit) => {
     if (!unit) return null;
     
@@ -22,3 +22,5 @@ export const unitDto = {
     return units.map(unit => unitDto.unitView(unit));
   }
 };
+
+export default unitDto;

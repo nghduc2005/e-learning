@@ -306,7 +306,7 @@ validation
               }
           })
           if (response.data.redirectUrl) {
-              window.location.href = response.data.redirectUrl;
+              if (window.opener) { window.close(); } else { window.history.back(); }
           }
       } catch (error) {
           console.log(error.response?.data || error);

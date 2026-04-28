@@ -1,4 +1,5 @@
 import { courseService } from "../../services/course.service.js";
+import curriculumService from "../../services/curriculum.service.js";
 
 export const courseController = {
   list: async (req, res) => {
@@ -37,6 +38,26 @@ export const courseController = {
       query: req.query
     })
   },
+  detail: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const course = await courseService.getCourseById(id);
+      if (!course) {
+        return res.redirect("/admin/course/list");
+      }
+      
+      const curriculum = await curriculumService.getCurriculumByCourseId(id);
+
+      res.render("admin/courseDetail", {
+        title: "Chi tiết khóa học",
+        course: course,
+        curriculum: curriculum
+      });
+    } catch (error) {
+      console.error("Lỗi trang Detail:", error);
+      res.redirect("/admin/course/list");
+    }
+  },
   create: (req, res) => {
     res.render("admin/courseCreate", {
       title: "Tạo khóa học"
@@ -61,6 +82,7 @@ export const courseController = {
     }
   },
   curriculum: (req, res) => {
+    
     res.render("admin/curriculum", {
       title: "Chương trình học"
     })
@@ -125,12 +147,67 @@ export const courseController = {
       const id = req.params.id;
       await courseService.deleteCourse(id);
       
-      // Lấy URL trang trước đó (referer) để redirect lại đúng page hiện tại
       const backURL = req.header('Referer') || '/admin/course/list';
       res.redirect(backURL);
     } catch (error) {
       console.error("Lỗi khi xóa khóa học:", error);
       res.redirect("/admin/course/list");
+    }
+  },
+  restore: async (req, res) => {
+    try {
+      const id = req.params.id;
+      await courseService.restoreCourse(id);
+      
+      const backURL = req.header('Referer') || '/admin/course/trash';
+      res.redirect(backURL);
+    } catch (error) {
+      console.error("Lỗi khi khôi phục khóa học:", error);
+      res.redirect("/admin/course/trash");
+    }
+  },
+  getUnits: async (req, res) => {
+    try {
+      const units = await courseService.getAllUnits();
+      res.json(units);
+    } catch (error) {
+      console.error("Error fetching units:", error);
+      res.status(500).json({ error: "Failed to fetch units" });
+    }
+  },
+
+  getLessons: async (req, res) => {
+    try {
+      const lessons = await courseService.getAllLessons();
+      res.json(lessons);
+    } catch (error) {
+      console.error("Error fetching lessons:", error);
+      res.status(500).json({ error: "Failed to fetch lessons" });
+    }
+  },
+  getCurriculumData: async (req, res) => {
+    try {
+      const curriculumData = await curriculumService.getCurriculumByCourseId(req.params.id);
+      res.json(curriculumData);
+    } catch (error) {
+      console.error("Lỗi khi lấy chương trình học:", error);
+      res.status(500).json({ error: "Lỗi lấy chương trình học" });
+    }
+  },
+  saveCurriculum: async (req, res) => {
+    try {
+      await curriculumService.saveCurriculum(req.params.id, req.body.curriculum);
+      res.json({
+        data: {
+          ok: 1,
+          message: "Lưu chương trình học thành công!"
+        }
+      });
+    } catch (error) {
+      console.error("Lỗi khi lưu chương trình học:", error);
+      res.status(500).json({
+        error: "Đã xảy ra lỗi trong quá trình lưu chương trình học!"
+      });
     }
   }
 }

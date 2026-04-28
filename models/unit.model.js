@@ -22,9 +22,9 @@ export const unitModel = {
     }
 
     if (sortCondition) {
-      query += ` ORDER BY ${sortCondition}`;
+      query += ` ORDER BY ${sortCondition}, u.id DESC`;
     } else {
-      query += ` ORDER BY u.createdAt DESC`;
+      query += ` ORDER BY u.createdAt DESC, u.id DESC`;
     }
 
     if (limit !== undefined && offset !== undefined) {

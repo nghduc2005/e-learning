@@ -5,11 +5,16 @@ const { courseSchema, validate } = require('../../middlewares/validate.middlewar
 const router = require('express').Router()
 
 router.get("/list", courseController.list)
+router.get("/detail/:id", courseController.detail)
 router.get("/create", courseController.create)
 router.get("/edit/:id", courseController.edit)
 router.post("/edit/:id", uploadCloud.single("banner"), validate(courseSchema), courseController.editPost)
 router.post("/delete/:id", courseController.delete)
-router.get("/curriculum", courseController.curriculum)
+router.post("/restore/:id", courseController.restore)
+router.get("/:id/curriculum", courseController.curriculum)
+router.get("/:id/curriculum/data", courseController.getCurriculumData)
 router.post("/create", uploadCloud.single("banner"), validate(courseSchema), courseController.createPost)
-
+router.get('/units', courseController.getUnits)
+router.get('/lessons', courseController.getLessons)
+router.post('/:id/curriculum', courseController.saveCurriculum)
 module.exports = router

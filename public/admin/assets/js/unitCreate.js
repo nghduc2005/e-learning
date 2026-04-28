@@ -41,7 +41,7 @@ validation
         try {
             const response = await axios.post("/admin/unit/create", finalData)
             if (response.data.data.ok) {
-                window.location.href = "/admin/unit/list";
+                if (window.opener) { window.close(); } else { window.history.back(); }
             }
         } catch (error) {
             console.error('Lỗi khi gửi dữ liệu:', error);

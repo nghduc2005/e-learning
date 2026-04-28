@@ -1,19 +1,19 @@
+import lessonDto from "../dtos/lesson.dto.js";
 import { lessonModel } from "../models/lesson.model.js";
-import { lessonDto } from "../dtos/lesson.dto.js";
 
 export const lessonService = {
   getLessonList: async (keyword, statusFilter, timeFilter, page = 1, limit = 5) => {
     try {
       const offset = (page - 1) * limit;
 
-      const totalItems = await lessonModel.countLessonList(keyword, statusFilter, timeFilter);
+      const totalItems = await lessonModel.countAll(keyword, statusFilter, timeFilter);
       const totalPages = Math.ceil(totalItems / limit);
 
-      const lessonsData = await lessonModel.getLessonList(
+      const lessonsData = await lessonModel.findAll(
         keyword, statusFilter, timeFilter, limit, offset
       );
 
-      const formattedLessons = lessonsData.map(l => lessonDto(l, false));
+      const formattedLessons = lessonsData.map(l => lessonDto.lessonView(l, false));
 
       return {
         lessons: formattedLessons,
@@ -31,15 +31,15 @@ export const lessonService = {
 
   createLesson: async (data) => {
     try {
-      return await lessonModel.createLesson(data);
+      return await lessonModel.create(data);
     } catch (error) {
       throw error;
     }
   },
 
   getLessonById: async (id) => {
-    try {
-      return await lessonModel.getLessonById(id);
+    try { 
+      return await lessonModel.findById(id);
     } catch (error) {
       throw error;
     }
@@ -47,7 +47,7 @@ export const lessonService = {
 
   updateLesson: async (id, data) => {
     try {
-      return await lessonModel.updateLesson(id, data);
+      return await lessonModel.update(id, data);
     } catch (error) {
       throw error;
     }
@@ -55,8 +55,8 @@ export const lessonService = {
 
   getDeletedLessons: async () => {
     try {
-      const lessons = await lessonModel.getDeletedLessons();
-      return lessons.map(lesson => lessonDto(lesson, true));
+      const lessons = await lessonModel.findDeleted();
+      return lessons.map(lesson => lessonDto.lessonView(lesson, true));
     } catch (error) {
       throw error;
     }

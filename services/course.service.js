@@ -1,6 +1,10 @@
 
 import { courseDto } from "../dtos/course.dto.js";
+import lessonDto from "../dtos/lesson.dto.js";
+import unitDto from "../dtos/unit.dto.js";
 import { courseModel } from "../models/course.model.js";
+import { lessonModel } from "../models/lesson.model.js";
+import { unitModel } from "../models/unit.model.js";
 
 export const courseService = {
   getCourseList: async (keyword = '', status = '', time = '', students = '', page = 1, limit = 10) => {
@@ -93,5 +97,37 @@ export const courseService = {
         console.error('Lỗi xóa khóa học:', error.message);
         throw error;
     }
-  }
+  },
+
+  restoreCourse: async (id) => {
+    try {
+        const isSuccess = await courseModel.restore(id);
+        if (!isSuccess) throw new Error("Không thể khôi phục khóa học");
+        return isSuccess;
+    } catch (error) {
+        console.error('Lỗi khôi phục khóa học:', error.message);
+        throw error;
+    }
+  },
+
+  getAllUnits: async () => {
+    try {
+      const data = await unitModel.findAll(); 
+      return data.map(item => unitDto.unitView(item));
+    } catch (error) {
+      console.error("Error in service: ", error);
+      throw error;
+    }
+  },
+
+  getAllLessons: async () => {
+    try {
+      const data = await lessonModel.findAll(); 
+      return data.map(item => lessonDto.lessonView(item));
+    } catch (error) {
+      console.error("Error in service: ", error);
+      throw error;
+    }
+  },
+  
 };

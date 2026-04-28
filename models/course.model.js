@@ -31,7 +31,7 @@ export const courseModel = {
     } else if (students === '100_500') {
       query += ` HAVING studentCount BETWEEN 100 AND 500`;
     }
-    query += ` ORDER BY c.createdAt DESC`;
+    query += ` ORDER BY c.createdAt DESC, c.id DESC`;
 
     const countQuery = `SELECT COUNT(*) as total FROM (${query}) as sub`;
     const [countResult] = await database.execute(countQuery, params);
@@ -112,6 +112,12 @@ export const courseModel = {
 
   softDelete: async (id) => {
     const query = `UPDATE courses SET deletedAt = NOW() WHERE id = ?`;
+    const [result] = await database.execute(query, [id]);
+    return result.affectedRows > 0;
+  },
+
+  restore: async (id) => {
+    const query = `UPDATE courses SET deletedAt = NULL WHERE id = ?`;
     const [result] = await database.execute(query, [id]);
     return result.affectedRows > 0;
   }

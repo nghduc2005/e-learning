@@ -39,12 +39,10 @@ const lessonController = {
   },
   createPost: async (req, res) => {
     try {
-      const { title, status, learnMode, score, questionsList } = req.body;
+      const { title, status, learnMode, score, questionsList, document} = req.body;
       const content = req.body.content; 
-      const document = req.body.document ? JSON.stringify(req.body.document) : null;
       
       const parsedQuestions = questionsList ? (typeof questionsList === 'string' ? JSON.parse(questionsList) : questionsList) : [];
-
       await lessonService.createLesson({
         name: title,
         status,
@@ -65,6 +63,8 @@ const lessonController = {
     try {
       const id = req.params.id;
       const lesson = await lessonService.getLessonById(id);
+      console.log(lesson);
+      
       if (!lesson) {
         return res.redirect("/admin/lesson/list");
       }
@@ -93,8 +93,8 @@ const lessonController = {
       if (req.body.content) {
         updateData.content = req.body.content;
       }
-      if (req.body.document) {
-        updateData.document = JSON.stringify(req.body.document);
+      if (req.body.document !== undefined) {
+        updateData.document = req.body.document;
       }
 
       await lessonService.updateLesson(id, updateData);

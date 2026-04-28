@@ -1,6 +1,6 @@
 <div class="flex items-center justify-between mb-8">
       <p class="text-sm text-gray-500 mt-1">Chỉnh sửa thông tin khóa học: <strong><%= course.name %></strong>.</p>
-  <a href="/admin/course/list" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center transition-colors">
+  <a href="javascript:void(0)" onclick="window.opener ? window.close() : history.back()" class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center transition-colors">
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       Quay lại danh sách
   </a>
@@ -108,7 +108,7 @@
                       <p class="mb-6 text-sm text-gray-500">Mọi thông tin chỉnh sửa sẽ không được lưu lại. Bạn có chắc chắn muốn quay lại danh sách?</p>
                       
                       <div class="flex items-center space-x-3 justify-center">
-                          <a href="/admin/course/list" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-xl text-sm inline-flex items-center px-5 py-2.5 text-center transition-all">
+                          <a href="javascript:void(0)" onclick="window.opener ? window.close() : history.back()" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-bold rounded-xl text-sm inline-flex items-center px-5 py-2.5 text-center transition-all">
                               Có
                           </a>
                           <button data-modal-hide="popup-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-indigo-300 rounded-xl border border-gray-200 text-sm font-bold px-5 py-2.5 hover:text-gray-900 transition-all">

@@ -121,11 +121,9 @@ export const editLessonSchema = Joi.object({
 export const validate = (schema) => {
   return (req, res, next) => {
       if(req.file) {
-        // Trong trường hợp upload .single(), req.file CHÍNH LÀ đối tượng file, KHÔNG CÓ key là tên field
         req.body[req.file.fieldname] = req.file.path;
       }
       if (req.files) {
-        // Trong trường hợp .fields(), req.files là Object chứa các mảng file
         if (req.files['content'] && req.files['content'][0]) {
           req.body.content = req.files['content'][0].path; 
         }

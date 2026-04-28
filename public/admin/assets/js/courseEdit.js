@@ -98,7 +98,7 @@ validation
             // Xử lý sau khi thành công
             if (response.data.data.ok) {
                 // Ví dụ redirect về danh sách
-                // window.location.href = "/admin/course/list";
+                if (window.opener) { window.close(); } else { window.history.back(); }
             }
         } catch (error) {
             console.error('Lỗi khi gửi dữ liệu cập nhật:', error);

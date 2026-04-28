@@ -30,9 +30,11 @@
           <% for(let i = 0; i < courseList.length; i++) {%> 
           <tr class="bg-white rounded-2xl hover:shadow-lg transition-all duration-300 group">
               <td class="px-6 py-5 rounded-s-2xl border-y border-s border-gray-100">
+                <a href="/admin/course/detail/<%=courseList[i].id%>">
                   <p class="font-semibold text-gray-900 text-base group-hover:text-indigo-600 transition-colors">
                       <%=courseList[i].name%>
                   </p>
+                </a>
               </td>
               
               <td class="px-6 py-5 border-y border-gray-100 text-center">
@@ -66,7 +68,7 @@
                         </button>
                     </form>
                   <% } else { %>
-                    <a href="/admin/course/curriculum">
+                    <a href="/admin/course/<%=courseList[i].id%>/curriculum">
                         <button title="Thiết kế chương trình học" 
                                 class="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all duration-200 shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

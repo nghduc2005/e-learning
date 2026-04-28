@@ -1,4 +1,5 @@
-export const lessonDto = (lesson, isTrash = false) => {
+const lessonDto = {
+  lessonView: (lesson, isTrash = false) => {
     if (!lesson) return null;
     
     const statusConfig = {
@@ -17,4 +18,7 @@ export const lessonDto = (lesson, isTrash = false) => {
       date: dateVal ? new Date(dateVal).toLocaleString('vi-VN') : '',
       isTrash: isTrash
     };
+  }
 };
+
+export default lessonDto;

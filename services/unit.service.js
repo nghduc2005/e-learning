@@ -1,5 +1,5 @@
 import { unitModel } from "../models/unit.model.js";
-import { unitDto } from "../dtos/unit.dto.js";
+import unitDto from "../dtos/unit.dto.js";
 
 export const unitService = {
   getUnitList: async (keyword, statusFilter, timeFilter, page = 1, limit = 5) => {

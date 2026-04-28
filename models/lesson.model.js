@@ -1,7 +1,7 @@
 import database from "../config/db.js";
 
 export const lessonModel = {
-  countLessonList: async (keyword, statusFilter, timeFilter) => {
+  countAll: async (keyword, statusFilter, timeFilter) => {
     let query = `SELECT COUNT(*) as total FROM lessons l WHERE l.deletedAt IS NULL`;
     const params = [];
 
@@ -31,7 +31,7 @@ export const lessonModel = {
     return rows[0].total;
   },
 
-  getLessonList: async (keyword, statusFilter, timeFilter, limit, offset) => {
+  findAll: async (keyword, statusFilter, timeFilter, limit, offset) => {
     let query = `SELECT l.* FROM lessons l WHERE l.deletedAt IS NULL`;
     const params = [];
 
@@ -57,7 +57,7 @@ export const lessonModel = {
       }
     }
 
-    query += ` ORDER BY l.createdAt DESC`;
+    query += ` ORDER BY l.createdAt DESC, l.id DESC`;
 
     if (limit !== undefined && offset !== undefined) {
       query += ` LIMIT ${Number(limit)} OFFSET ${Number(offset)}`;
@@ -67,17 +67,26 @@ export const lessonModel = {
     return rows;
   },
 
-  createLesson: async (data) => {
+  create: async (data) => {
     const connection = await database.getConnection();
     try {
       await connection.beginTransaction();
-
       const [lessonResult] = await connection.execute(
-        `INSERT INTO lessons (name, content, learnMode, status, passScore, document) VALUES (?, ?, ?, ?, ?, ?)`,
-        [data.name, data.content, data.learnMode, data.status, data.passScore, data.document]
+        `INSERT INTO lessons (name, content, learnMode, status, passScore) VALUES (?, ?, ?, ?, ?)`,
+        [data.name, data.content, data.learnMode, data.status, data.passScore]
       );
       const lessonId = lessonResult.insertId;
-
+      
+      if (data.document && data.document.length > 0) {
+        for (const url of data.document) {
+          const fileName = url.split('/').pop(); 
+          const fileType = fileName.split('.').pop();
+          await connection.execute(
+            `INSERT INTO lesson_documents (lessonId, name, url, fileType) VALUES (?, ?, ?, ?)`,
+            [lessonId, fileName, url, fileType]
+          );
+        }
+      }
       if (data.questionsList && data.questionsList.length > 0) {
         for (const q of data.questionsList) {
           const [qResult] = await connection.execute(
@@ -100,38 +109,55 @@ export const lessonModel = {
       return lessonId;
     } catch (error) {
       await connection.rollback();
+      console.log(error);
+      
       throw error;
     } finally {
       connection.release();
     }
   },
 
-  getLessonById: async (id) => {
-    const [lessons] = await database.execute(`SELECT * FROM lessons WHERE id = ? AND deletedAt IS NULL`, [id]);
-    if (lessons.length === 0) return null;
-    const lesson = lessons[0];
+  findById: async (id) => {
+      const [lessons] = await database.execute(
+          `SELECT * FROM lessons WHERE id = ? AND deletedAt IS NULL`, 
+          [id]
+      );
+      if (lessons.length === 0) return null;
+      const lesson = lessons[0];
+      const [documents] = await database.execute(
+          `SELECT id, name, url, fileType FROM lesson_documents WHERE lessonId = ?`,
+          [id]
+      );
+      lesson.documents = documents;
+      const [questions] = await database.execute(
+          `SELECT id, question as content FROM questions WHERE lessonId = ?`, 
+          [id]
+      );
+      const questionsWithAnswers = await Promise.all(questions.map(async (q) => {
+          const [answers] = await database.execute(
+              `SELECT answer, isCorrect FROM answers WHERE questionId = ? ORDER BY id ASC`, 
+              [q.id]
+          );
+          
+          return {
+              id: q.id,
+              content: q.content,
+              answers: answers.map(a => a.answer),
+              correctAnswer: answers.findIndex(a => a.isCorrect === 1)
+          };
+      }));
 
-    const [questions] = await database.execute(`SELECT * FROM questions WHERE lessonId = ?`, [id]);
-    
-    const questionsWithAnswers = await Promise.all(questions.map(async (q) => {
-      const [answers] = await database.execute(`SELECT * FROM answers WHERE questionId = ? ORDER BY id ASC`, [q.id]);
-      return {
-        id: q.id,
-        content: q.question,
-        answers: answers.map(a => a.answer),
-        correctAnswer: answers.findIndex(a => a.isCorrect === 1)
-      };
-    }));
+      lesson.questionsList = questionsWithAnswers;
+      console.log(lesson);
+      return lesson;
+    },
 
-    lesson.questionsList = questionsWithAnswers;
-    return lesson;
-  },
-
-  updateLesson: async (id, data) => {
+  update: async (id, data) => {
     const connection = await database.getConnection();
     try {
       await connection.beginTransaction();
 
+      // 1. Cập nhật thông tin cơ bản của bài học
       let query = `UPDATE lessons SET name = ?, learnMode = ?, status = ?, passScore = ?`;
       const params = [data.name, data.learnMode, data.status, data.passScore];
 
@@ -139,24 +165,39 @@ export const lessonModel = {
         query += `, content = ?`;
         params.push(data.content);
       }
-      if (data.document !== undefined) {
-        query += `, document = ?`;
-        params.push(data.document);
-      }
 
       query += ` WHERE id = ?`;
       params.push(id);
-
       await connection.execute(query, params);
 
-      // Xóa câu hỏi cũ
+      // 2. Cập nhật tài liệu đính kèm (lesson_documents)
+      // Chỉ thực hiện nếu data.document được gửi lên (kể cả mảng rỗng để xóa hết)
+      if (data.document !== undefined) {
+        // Xóa tài liệu cũ
+        await connection.execute(`DELETE FROM lesson_documents WHERE lessonId = ?`, [id]);
+        
+        // Thêm tài liệu mới
+        if (data.document && data.document.length > 0) {
+          for (const url of data.document) {
+            const fileName = url.split('/').pop(); 
+            const fileType = fileName.split('.').pop();
+            await connection.execute(
+              `INSERT INTO lesson_documents (lessonId, name, url, fileType) VALUES (?, ?, ?, ?)`,
+              [id, fileName, url, fileType]
+            );
+          }
+        }
+      }
+
+      // 3. Cập nhật câu hỏi và câu trả lời (Xóa cũ - Thêm mới)
+      // Lấy danh sách câu hỏi cũ để xóa câu trả lời liên quan
       const [oldQs] = await connection.execute(`SELECT id FROM questions WHERE lessonId = ?`, [id]);
       for (const oldQ of oldQs) {
         await connection.execute(`DELETE FROM answers WHERE questionId = ?`, [oldQ.id]);
-        await connection.execute(`DELETE FROM questions WHERE id = ?`, [oldQ.id]);
       }
+      await connection.execute(`DELETE FROM questions WHERE lessonId = ?`, [id]);
 
-      // Thêm câu hỏi mới
+      // Thêm danh sách câu hỏi mới
       if (data.questionsList && data.questionsList.length > 0) {
         for (const q of data.questionsList) {
           const [qResult] = await connection.execute(
@@ -179,13 +220,14 @@ export const lessonModel = {
       return true;
     } catch (error) {
       await connection.rollback();
+      console.log(error);
       throw error;
     } finally {
       connection.release();
     }
   },
 
-  getDeletedLessons: async () => {
+  findDeleted: async () => {
     const query = `SELECT id, name, status, deletedAt FROM lessons WHERE deletedAt IS NOT NULL ORDER BY deletedAt DESC`;
     const [rows] = await database.execute(query);
     return rows;

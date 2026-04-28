@@ -23,7 +23,7 @@ const storage = new CloudinaryStorage({
             // Loại bỏ dấu tiếng Việt và khoảng trắng để tránh lỗi 400
             public_id: `${Date.now()}-${file.fieldname}`, 
             // Cho phép các định dạng tài liệu
-            access_mode: 'authenticated',
+            access_mode: 'public',
             flags: folderType === 'documents' ? "attachment" : undefined
         };
     },

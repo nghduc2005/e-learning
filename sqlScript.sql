@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `units` (
     `status` ENUM('hidden', 'locked', 'active') NOT NULL DEFAULT 'hidden',
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    `deletedAt` TIMESTAMP NULL DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -62,9 +63,27 @@ CREATE TABLE IF NOT EXISTS `lessons` (
     `document` VARCHAR(255) DEFAULT NULL,
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updatedAt` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    `deletedAt` TIMESTAMP NULL DEFAULT NULL,
 	CONSTRAINT `chk_pass_score_range` CHECK (`passScore` BETWEEN 0 AND 100),
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_lesson_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `lesson_documents` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `lessonId` INT UNSIGNED NOT NULL,
+    `name` VARCHAR(255) NOT NULL,    -- Tên file hiển thị (ví dụ: Bai_tap_JS.pdf)
+    `url` VARCHAR(500) NOT NULL,     -- Link file (Cloudinary, S3, v.v.)
+    `fileType` VARCHAR(50) DEFAULT NULL, -- Loại file (pdf, docx, zip...)
+    `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updatedAt` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    INDEX `idx_lesson_document` (`lessonId`),
+    CONSTRAINT `fk_document_lesson`
+        FOREIGN KEY (`lessonId`)
+        REFERENCES `lessons` (`id`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `unit_lessons` (
