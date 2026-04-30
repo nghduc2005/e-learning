@@ -140,6 +140,7 @@ CREATE TABLE IF NOT EXISTS `answers` (
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(50) NOT NULL,
+    `email` VARCHAR(150) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `avatar` VARCHAR(255) DEFAULT NULL,
     `status` ENUM('active', 'banned', 'unverified') NOT NULL DEFAULT 'unverified',
@@ -148,6 +149,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_username` (`username`)
+    UNIQUE KEY `uk_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `reviews` (
@@ -363,3 +365,14 @@ CREATE TABLE IF NOT EXISTS `question_attempts` (
         ON DELETE CASCADE,
     INDEX `idx_user_lesson_attempt` (`userId`, `lessonId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tài khoản admin mặc định
+-- username: admin | password: Admin@123 (SHA-256)
+INSERT INTO `admins` (`username`, `email`, `password`, `status`) VALUES (
+    'admin',
+    'admin@example.com',
+    'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7',
+    'active'
+);
+
+

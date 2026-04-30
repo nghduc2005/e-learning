@@ -29,7 +29,7 @@ export const courseService = {
     try {
         const course = await courseModel.findById(id);
         if (!course) return null;
-        return course;
+        return courseDto.courseView(course);
     } catch (error) {
         console.error('Lỗi lấy thông tin khóa học:', error.message);
         throw error;

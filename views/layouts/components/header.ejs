@@ -16,11 +16,11 @@
     <div class="relative group inline-block">
     
       <div class="flex items-center space-x-3 p-1 pr-3 rounded-lg bg-white border border-gray-100 shadow-sm transition-all duration-200 cursor-pointer group-hover:shadow-md group-hover:border-indigo-100">
-          <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-sm">
-              JD
+          <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold shadow-sm text-sm">
+              <%= typeof currentAdmin !== 'undefined' && currentAdmin ? currentAdmin.username.substring(0,2).toUpperCase() : 'AD' %>
           </div>
           <div class="text-left hidden md:block">
-              <p class="text-xs font-bold text-gray-800 leading-none font-sans">John Doe</p>
+              <p class="text-xs font-bold text-gray-800 leading-none font-sans"><%= typeof currentAdmin !== 'undefined' && currentAdmin ? currentAdmin.username : 'Admin' %></p>
               <p class="text-[10px] text-gray-500 mt-1 uppercase tracking-tighter">Quản trị viên</p>
           </div>
           <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +33,7 @@
               
               <div class="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
                   <p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Tài khoản</p>
-                  <p class="text-sm font-semibold text-gray-900 mt-1 truncate">johndoe@email.com</p>
+                  <p class="text-sm font-semibold text-gray-900 mt-1 truncate"><%= typeof currentAdmin !== 'undefined' && currentAdmin ? currentAdmin.email : '' %></p>
               </div>
   
               <div class="p-2 space-y-1">
@@ -58,14 +58,16 @@
               </div>
   
               <div class="p-2 mt-1 border-t border-gray-50">
-                  <a href="/logout" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm text-red-600 hover:bg-red-50 transition-colors group/logout">
-                      <div class="w-8 h-8 rounded-lg bg-red-100/50 flex items-center justify-center group-hover/logout:bg-red-100 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                        </svg>                        
-                      </div>
-                      <span class="font-bold">Đăng xuất tài khoản</span>
-                  </a>
+                  <form action="/admin/auth/logout" method="POST">
+                    <button type="submit" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm text-red-600 hover:bg-red-50 transition-colors group/logout cursor-pointer">
+                        <div class="w-8 h-8 rounded-lg bg-red-100/50 flex items-center justify-center group-hover/logout:bg-red-100 transition-colors">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                          </svg>
+                        </div>
+                        <span class="font-bold">Đăng xuất tài khoản</span>
+                    </button>
+                  </form>
               </div>
           </div>
       </div>

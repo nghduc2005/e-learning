@@ -48,6 +48,21 @@ app.use((req, res, next) => {
 app.use('/admin', adminRoute)
 app.use('/', clientRoute)
 
+// 404 – không tìm thấy route
+app.use((req, res) => {
+  res.status(404).render('errors/404', { layout: false });
+});
+
+// Xử lý lỗi toàn cục
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const status = err.status || err.statusCode || 500;
+  if (status === 403) {
+    return res.status(403).render('errors/403', { layout: false });
+  }
+  res.status(status).render('errors/500', { layout: false, message: err.message });
+});
+
 app.listen(port, () => {
   console.log(`Đang lắng nghe cổng ${port}`)
 })

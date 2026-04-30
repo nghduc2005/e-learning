@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>403 – Không có quyền truy cập</title>
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-32 -right-32 w-96 h-96 bg-amber-100 rounded-full blur-3xl opacity-60"></div>
+    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-orange-100 rounded-full blur-3xl opacity-60"></div>
+  </div>
+
+  <div class="relative z-10 text-center max-w-lg w-full">
+
+    <div class="relative mb-6 select-none">
+      <p class="text-[9rem] md:text-[12rem] font-black text-amber-100 leading-none tracking-tighter">403</p>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-24 h-24 bg-white rounded-3xl shadow-lg shadow-amber-100 flex items-center justify-center border border-amber-50">
+          <svg class="w-12 h-12 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M12 15v2m0 0v2m0-2h2m-2 0H10m2-6V9m0 0V7m0 2h2m-2 0H10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-800 mb-3">Không có quyền truy cập</h1>
+    <p class="text-gray-400 text-sm leading-relaxed mb-8">
+      Bạn không có quyền truy cập vào trang này.<br>Vui lòng đăng nhập hoặc liên hệ quản trị viên.
+    </p>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href="javascript:history.back()"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Quay lại
+      </a>
+      <a href="/admin/auth/login"
+        class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold rounded-xl transition-all shadow-sm shadow-amber-200 hover:-translate-y-0.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+        </svg>
+        Đăng nhập
+      </a>
+    </div>
+
+    <p class="mt-10 text-xs text-gray-300">E-Learning Platform &mdash; Mã lỗi 403</p>
+  </div>
+
+</body>
+</html>

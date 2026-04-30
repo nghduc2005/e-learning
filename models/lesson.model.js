@@ -79,7 +79,8 @@ export const lessonModel = {
       
       if (data.document && data.document.length > 0) {
         for (const url of data.document) {
-          const fileName = url.split('/').pop(); 
+          const rawFileName = url.split('/').pop(); 
+          const fileName = rawFileName.replace(/^\d{13}-/, '');
           const fileType = fileName.split('.').pop();
           await connection.execute(
             `INSERT INTO lesson_documents (lessonId, name, url, fileType) VALUES (?, ?, ?, ?)`,
@@ -179,7 +180,8 @@ export const lessonModel = {
         // Thêm tài liệu mới
         if (data.document && data.document.length > 0) {
           for (const url of data.document) {
-            const fileName = url.split('/').pop(); 
+            const rawFileName = url.split('/').pop(); 
+            const fileName = rawFileName.replace(/^\d{13}-/, '');
             const fileType = fileName.split('.').pop();
             await connection.execute(
               `INSERT INTO lesson_documents (lessonId, name, url, fileType) VALUES (?, ?, ?, ?)`,

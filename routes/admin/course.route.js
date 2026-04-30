@@ -17,4 +17,9 @@ router.post("/create", uploadCloud.single("banner"), validate(courseSchema), cou
 router.get('/units', courseController.getUnits)
 router.get('/lessons', courseController.getLessons)
 router.post('/:id/curriculum', courseController.saveCurriculum)
+
+// Review management
+router.get('/:id/reviews', courseController.reviews)
+router.post('/review/:reviewId/delete', courseController.deleteReview)
+
 module.exports = router

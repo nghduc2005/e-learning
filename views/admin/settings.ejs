@@ -1,0 +1,170 @@
+<p class="text-sm text-gray-500 -mt-4 mb-6">Cấu hình và tùy chỉnh nền tảng E-Learning của bạn.</p>
+
+<!-- Flash message -->
+<% if (typeof flash !== 'undefined' && flash) { %>
+<div class="mb-6 flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+  <%= flash.type === 'success'
+    ? 'bg-green-50 border border-green-200 text-green-700'
+    : 'bg-red-50 border border-red-200 text-red-700' %>">
+  <% if (flash.type === 'success') { %>
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+  <% } else { %>
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.072 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+    </svg>
+  <% } %>
+  <%= flash.message %>
+</div>
+<% } %>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+  <!-- Cột trái: Form cài đặt chung -->
+  <div class="xl:col-span-2">
+    <form action="/admin/settings" method="POST">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-gray-800">Cài đặt chung</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Thông tin cơ bản của nền tảng</p>
+          </div>
+        </div>
+
+        <div class="p-6 space-y-5">
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+              Tên nền tảng <span class="text-red-400">*</span>
+            </label>
+            <input
+              type="text" name="siteName" required
+              value="<%= settings.siteName %>"
+              placeholder="VD: E-Learning Platform"
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all"
+            >
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Mô tả nền tảng</label>
+            <textarea
+              name="siteDescription" rows="3"
+              placeholder="Mô tả ngắn về nền tảng của bạn..."
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all resize-none"
+            ><%= settings.siteDescription %></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email liên hệ</label>
+            <input
+              type="email" name="contactEmail"
+              value="<%= settings.contactEmail %>"
+              placeholder="support@example.com"
+              class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all"
+            >
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div>
+              <p class="text-sm font-semibold text-gray-700">Chế độ bảo trì</p>
+              <p class="text-xs text-gray-400 mt-0.5">Tạm dừng truy cập của người dùng vào hệ thống</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="maintenanceMode" class="sr-only peer"
+                <%= settings.maintenanceMode ? 'checked' : '' %>>
+              <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+            </label>
+          </div>
+
+        </div>
+
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+          <button type="submit"
+            class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all shadow-sm shadow-indigo-200 hover:-translate-y-0.5 active:translate-y-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+            </svg>
+            Lưu cài đặt
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- Cột phải: Thông tin hệ thống -->
+  <div class="xl:col-span-1 space-y-6">
+
+    <!-- Trạng thái hệ thống -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="text-sm font-bold text-gray-800">Thông tin hệ thống</h3>
+      </div>
+      <div class="p-6 space-y-4">
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-500">Trạng thái DB</span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+            Kết nối
+          </span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-500">Bảo trì</span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+            <%= settings.maintenanceMode ? 'bg-orange-50 text-orange-600' : 'bg-gray-100 text-gray-500' %>">
+            <%= settings.maintenanceMode ? 'Đang bật' : 'Tắt' %>
+          </span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-500">Số admin</span>
+          <span class="text-sm font-semibold text-gray-700"><%= adminCount %></span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-500">Runtime</span>
+          <span class="text-sm font-semibold text-gray-700">Node.js</span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-500">Framework</span>
+          <span class="text-sm font-semibold text-gray-700">Express 5</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Phiên bản nền tảng -->
+    <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs text-white/70 uppercase font-bold tracking-wider">Nền tảng</p>
+          <p class="text-sm font-bold"><%= settings.siteName %></p>
+        </div>
+      </div>
+      <p class="text-xs text-white/60 leading-relaxed">
+        <%= settings.siteDescription || 'Chưa có mô tả.' %>
+      </p>
+      <% if (settings.contactEmail) { %>
+      <p class="text-xs text-white/80 mt-3 font-medium"><%= settings.contactEmail %></p>
+      <% } %>
+    </div>
+
+  </div>
+
+</div>

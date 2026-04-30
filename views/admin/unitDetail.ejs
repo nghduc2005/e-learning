@@ -1,0 +1,43 @@
+<p class="text-sm text-gray-500 -mt-4 mb-4">Xem thông tin chi tiết của chương học.</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex justify-between items-center">
+        <div></div>
+        <a href="/admin/unit/edit/<%= unit.id %>" class="inline-flex items-center px-4 py-2 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            Chỉnh sửa
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="space-y-6 lg:col-span-1">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Thông tin hệ thống</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500 font-medium">Trạng thái</span>
+                        <% const statusColors = { active: 'bg-green-100 text-green-700', locked: 'bg-yellow-100 text-yellow-700', hidden: 'bg-gray-100 text-gray-700' }; %>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase <%= statusColors[unit.status] || 'bg-gray-100 text-gray-700' %>">
+                            <%= unit.status === 'active' ? 'Hoạt động' : unit.status === 'locked' ? 'Khóa' : 'Ẩn' %>
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500 font-medium">Ngày tạo</span>
+                        <span class="text-gray-800 font-bold"><%= new Date(unit.createdAt).toLocaleString('vi-VN') %></span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500 font-medium">Cập nhật cuối</span>
+                        <span class="text-gray-800 font-bold"><%= unit.updatedAt ? new Date(unit.updatedAt).toLocaleString('vi-VN') : 'N/A' %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-2">Tên chương</h4>
+                    <h1 class="text-3xl font-black text-gray-900 leading-tight"><%= unit.name %></h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

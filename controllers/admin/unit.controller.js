@@ -1,4 +1,5 @@
 import { unitService } from "../../services/unit.service.js";
+import logAction from "../../utils/auditLogger.js";
 
 const unitController = {
   list: async (req, res) => {
@@ -34,6 +35,25 @@ const unitController = {
     })
   },
 
+  detail: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const unit = await unitService.getUnitById(id);
+
+      if (!unit) {
+        return res.redirect("/admin/unit/list");
+      }
+
+      res.render("admin/unitDetail", {
+        title: "Chi tiết chương",
+        unit: unit
+      });
+    } catch (error) {
+      console.error("Lỗi trang Detail Unit:", error);
+      res.redirect("/admin/unit/list");
+    }
+  },
+
   create: (req, res) => {
     res.render("admin/unitCreate", {
       title: "Tạo chương"
@@ -48,6 +68,8 @@ const unitController = {
       };
 
       await unitService.createUnit(data);
+
+      await logAction(req.session.admin?.id, 'create_unit', `Tạo chương: ${req.body.title}`);
 
       res.json({
         data: {
@@ -90,6 +112,8 @@ const unitController = {
 
       await unitService.updateUnit(id, data);
 
+      await logAction(req.session.admin?.id, 'update_unit', `Cập nhật chương: ${req.body.title}`);
+
       res.json({
         data: {
           ok: 1,
@@ -107,6 +131,8 @@ const unitController = {
       const id = req.params.id;
       await unitService.deleteUnit(id);
 
+      await logAction(req.session.admin?.id, 'delete_unit', `Xóa chương #${id}`);
+
       const backURL = req.header('Referer') || '/admin/unit/list';
       res.redirect(backURL);
     } catch (error) {
@@ -119,6 +145,8 @@ const unitController = {
     try {
       const id = req.params.id;
       await unitService.restoreUnit(id);
+
+      await logAction(req.session.admin?.id, 'restore_unit', `Khôi phục chương #${id}`);
 
       const backURL = req.header('Referer') || '/admin/trash';
       res.redirect(backURL);

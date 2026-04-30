@@ -1,8 +1,14 @@
-const courseController = require("../../controllers/client/course.controller")
-const router = require('express').Router()
+const router = require('express').Router();
+const authRoute = require('./auth.route');
+const { userAuth } = require('../../middlewares/userAuth.middleware');
 
-router.get("/", (req, res) => {
-  res.render("index")
-})
+// Gắn thông tin user (nếu có) vào res.locals cho mọi route client
+router.use(userAuth);
 
-module.exports = router
+router.use('/', authRoute);
+
+router.get('/', (req, res) => {
+  res.render('index');
+});
+
+module.exports = router;

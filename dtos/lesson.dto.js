@@ -8,14 +8,13 @@ const lessonDto = {
       "locked": { text: "Khóa", bgClass: "bg-amber-50 text-amber-600 border-amber-100", dotClass: "bg-amber-500" }
     };
 
-    const dateVal = isTrash ? lesson.deletedAt : lesson.createdAt;
-
     return {
       id: lesson.id,
       name: lesson.name,
       status: lesson.status,
       statusDisplay: statusConfig[lesson.status] || statusConfig["hidden"],
-      date: dateVal ? new Date(dateVal).toLocaleString('vi-VN') : '',
+      createdAt: new Date(lesson.createdAt).toLocaleString('vi-VN'),
+      deletedAt: lesson.deletedAt ? new Date(lesson.deletedAt).toLocaleString('vi-VN') : null,
       isTrash: isTrash
     };
   }

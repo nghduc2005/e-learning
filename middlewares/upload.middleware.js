@@ -17,11 +17,19 @@ const storage = new CloudinaryStorage({
             folderType = 'documents';
         }
 
+        const originalName = file.originalname.split('.').slice(0, -1).join('.');
+        const safeName = originalName
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-zA-Z0-9 -]/g, "")
+            .replace(/\s+/g, '-')
+            .toLowerCase();
+
         return {
             folder: `e-learning/${folderType}`,
             resource_type: 'auto', // Quan trọng để nhận diện video/docs
             // Loại bỏ dấu tiếng Việt và khoảng trắng để tránh lỗi 400
-            public_id: `${Date.now()}-${file.fieldname}`, 
+            public_id: `${Date.now()}-${safeName}`, 
             // Cho phép các định dạng tài liệu
             access_mode: 'public',
             flags: folderType === 'documents' ? "attachment" : undefined

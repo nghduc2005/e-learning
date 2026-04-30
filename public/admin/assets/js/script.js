@@ -34,4 +34,10 @@ if(removeImage) {
 }
 
 
-
+// Force reload when page is loaded from Back-Forward Cache (BFCache)
+// Fixes issue where returning to list page shows old data after create/update/delete
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});

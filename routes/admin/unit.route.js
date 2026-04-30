@@ -5,6 +5,7 @@ import express from 'express'
 const router = express.Router()
 
 router.get("/list", unitController.list)
+router.get("/detail/:id", unitController.detail)
 router.get("/create", unitController.create)
 router.post("/create", validate(unitSchema), unitController.createPost)
 router.get("/edit/:id", unitController.edit)
