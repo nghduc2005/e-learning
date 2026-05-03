@@ -24,6 +24,14 @@ const reviewService = {
   },
 
   deleteReview: async (reviewId) => reviewModel.hardDelete(reviewId),
+
+  createReview: async (data) => {
+    return await reviewModel.create(data);
+  },
+
+  getUserReview: async (userId, courseId) => {
+    return await reviewModel.findByUserAndCourse(userId, courseId);
+  },
 };
 
 export default reviewService;

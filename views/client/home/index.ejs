@@ -1,0 +1,203 @@
+<!-- ===== HERO SECTION ===== -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-orb hero-orb--1"></div>
+    <div class="hero-orb hero-orb--2"></div>
+    <div class="hero-orb hero-orb--3"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span>Nền tảng học tập hàng đầu</span>
+    </div>
+    <h1 class="hero-title">
+      Mở rộng kiến thức,<br>
+      <span class="gradient-text">Nâng tầm sự nghiệp</span>
+    </h1>
+    <p class="hero-subtitle">
+      Khám phá hàng trăm khoá học chất lượng cao được thiết kế bởi các chuyên gia hàng đầu.
+      Học mọi lúc, mọi nơi theo tốc độ của bạn.
+    </p>
+    <div class="hero-actions">
+      <a href="#courses-section" class="btn btn-primary btn-lg" id="hero-cta">
+        Khám phá khoá học
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <% if (typeof user === 'undefined' || !user) { %>
+        <a href="/register" class="btn btn-ghost btn-lg" id="hero-register">Đăng ký miễn phí</a>
+      <% } %>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num"><%= activeCourses.length + lockedCourses.length %></span>
+        <span class="stat-label">Khoá học</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num"><%= activeCourses.length %></span>
+        <span class="stat-label">Đang mở</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">Kiến thức</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card-float hero-card-float--1">
+      <div class="float-card">
+        <span class="float-icon">🎓</span>
+        <div>
+          <div class="float-title">Học viên mới</div>
+          <div class="float-sub">Vừa đăng ký khoá Python</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-card-float hero-card-float--2">
+      <div class="float-card">
+        <span class="float-icon">⭐</span>
+        <div>
+          <div class="float-title">Đánh giá 5 sao</div>
+          <div class="float-sub">Khoá học Web Design</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-illustration">
+      <div class="illustration-circle">
+        <span class="illustration-emoji">💡</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ACTIVE COURSES ===== -->
+<section class="courses-section" id="courses-section">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-label">
+        <span class="label-dot label-dot--active"></span>
+        Đang mở đăng ký
+      </div>
+      <h2 class="section-title">Khoá học <span class="gradient-text">nổi bật</span></h2>
+      <p class="section-subtitle">Những khoá học đang mở – bắt đầu ngay hôm nay!</p>
+    </div>
+
+    <% if (activeCourses.length > 0) { %>
+      <div class="courses-grid" id="active-courses-grid">
+        <% activeCourses.forEach(function(course, idx) { %>
+          <article class="course-card course-card--active" id="course-<%= course.id %>">
+            <div class="card-banner">
+              <% if (course.banner) { %>
+                <img src="<%= course.banner %>" alt="<%= course.name %>" class="card-img" loading="lazy">
+              <% } else { %>
+                <div class="card-img-placeholder card-gradient-banner" data-index="<%= idx % 6 %>">
+                  <span class="banner-title"><%= course.name %></span>
+                </div>
+              <% } %>
+              <div class="card-status card-status--active">
+                <span class="status-dot"></span>
+                Đang mở
+              </div>
+            </div>
+            <div class="card-body">
+              <h3 class="card-title"><%= course.name %></h3>
+              <div class="card-meta">
+                <div class="meta-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <span><%= course.studentCount %> học viên</span>
+                </div>
+                <% if (course.avgRating) { %>
+                  <div class="meta-item meta-rating">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span><%= course.avgRating.toFixed(1) %> (<%= course.reviewCount %>)</span>
+                  </div>
+                <% } %>
+              </div>
+              <a href="/courses/<%= course.id %>" class="btn btn-primary btn-card" id="enroll-<%= course.id %>">
+                Xem khoá học
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state" id="active-empty">
+        <span class="empty-icon">🔍</span>
+        <p>Hiện chưa có khoá học nào đang mở.</p>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- ===== LOCKED COURSES ===== -->
+<% if (lockedCourses.length > 0) { %>
+<section class="courses-section courses-section--locked" id="locked-courses-section">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-label">
+        <span class="label-dot label-dot--locked"></span>
+        Tạm khoá
+      </div>
+      <h2 class="section-title">Khoá học <span class="gradient-text-locked">sắp ra mắt</span></h2>
+      <p class="section-subtitle">Những khoá học đang tạm khoá – đăng ký để nhận thông báo sớm nhất!</p>
+    </div>
+
+    <div class="courses-grid" id="locked-courses-grid">
+      <% lockedCourses.forEach(function(course, idx) { %>
+        <article class="course-card course-card--locked" id="locked-course-<%= course.id %>">
+          <div class="card-banner">
+            <% if (course.banner) { %>
+              <img src="<%= course.banner %>" alt="<%= course.name %>" class="card-img card-img--locked" loading="lazy">
+            <% } else { %>
+              <div class="card-img-placeholder card-gradient-banner card-gradient-banner--locked" data-index="<%= idx % 6 %>">
+                <span class="banner-title"><%= course.name %></span>
+              </div>
+            <% } %>
+            <div class="card-lock-overlay">
+              <svg class="lock-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div class="card-status card-status--locked">
+              <span class="status-dot"></span>
+              Tạm khoá
+            </div>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title"><%= course.name %></h3>
+            <div class="card-meta">
+              <div class="meta-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                <span><%= course.studentCount %> học viên quan tâm</span>
+              </div>
+            </div>
+            <button class="btn btn-locked btn-card" disabled id="notify-<%= course.id %>">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Chưa mở đăng ký
+            </button>
+          </div>
+        </article>
+      <% }); %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ===== NO COURSES AT ALL ===== -->
+<% if (activeCourses.length === 0 && lockedCourses.length === 0) { %>
+<section class="courses-section" id="no-courses-section">
+  <div class="section-container">
+    <div class="empty-state empty-state--full" id="all-empty">
+      <span class="empty-icon">📭</span>
+      <h3>Chưa có khoá học nào</h3>
+      <p>Hệ thống đang chuẩn bị nội dung. Vui lòng quay lại sau!</p>
+    </div>
+  </div>
+</section>
+<% } %>

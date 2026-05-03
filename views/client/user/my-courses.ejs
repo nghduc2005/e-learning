@@ -1,0 +1,281 @@
+<style>
+.mc-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+.mc-header {
+  margin-bottom: 32px;
+}
+.mc-header h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+.mc-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Empty state */
+.mc-empty {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--text-muted);
+}
+.mc-empty-icon { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+.mc-empty h2 { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.mc-empty p  { font-size: 0.9rem; margin-bottom: 24px; }
+
+/* Course list */
+.mc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mc-card {
+  display: flex;
+  gap: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+}
+.mc-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* Thumbnail */
+.mc-thumb {
+  width: 180px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  overflow: hidden;
+  position: relative;
+}
+.mc-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.mc-thumb-gradient {
+  width: 100%;
+  height: 100%;
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  padding: 12px;
+}
+.mc-thumb-gradient[data-hash="0"] { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+.mc-thumb-gradient[data-hash="1"] { background: linear-gradient(135deg,#0891b2,#06b6d4); }
+.mc-thumb-gradient[data-hash="2"] { background: linear-gradient(135deg,#7c3aed,#a78bfa); }
+.mc-thumb-gradient[data-hash="3"] { background: linear-gradient(135deg,#0f766e,#14b8a6); }
+.mc-thumb-gradient[data-hash="4"] { background: linear-gradient(135deg,#b45309,#f59e0b); }
+.mc-thumb-gradient[data-hash="5"] { background: linear-gradient(135deg,#be185d,#f472b6); }
+
+/* Info */
+.mc-info {
+  flex: 1;
+  padding: 20px 20px 20px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+.mc-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mc-enrolled-date {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* Progress bar */
+.mc-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.mc-progress-bar {
+  flex: 1;
+  height: 7px;
+  background: var(--bg-surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.mc-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.mc-progress-fill.done { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.mc-progress-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* CTA */
+.mc-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 0.83rem;
+  font-weight: 600;
+  align-self: flex-start;
+  transition: background 0.2s;
+}
+.mc-cta:hover { background: var(--primary-dark); color: #fff; }
+.mc-cta.done {
+  background: #14532d;
+  color: #4ade80;
+}
+
+@media (max-width: 600px) {
+  .mc-card { flex-direction: column; }
+  .mc-thumb { width: 100%; height: 140px; }
+  .mc-info  { padding: 16px; }
+}
+
+body {
+  padding-top: var(--nav-h); /* Sử dụng biến CSS đã được định nghĩa trong style.css */
+}
+
+.mc-action-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Nút Nhận chứng chỉ */
+.mc-cert-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: linear-gradient(135deg, #eab308, #ca8a04); /* Màu vàng Gold */
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 10px rgba(234, 179, 8, 0.2);
+}
+
+.mc-cert-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+  color: #fff;
+}
+</style>
+
+<div class="mc-wrap">
+  <div class="mc-header">
+    <h1>📚 Khoá học của tôi</h1>
+    <p>Tiếp tục hành trình học tập của bạn</p>
+  </div>
+
+  <% if (courses.length === 0) { %>
+    <div class="mc-empty">
+      <span class="mc-empty-icon">🎓</span>
+      <h2>Bạn chưa đăng ký khoá học nào</h2>
+      <p>Khám phá các khoá học và bắt đầu học ngay hôm nay!</p>
+      <a href="/" class="btn btn-primary">Xem khoá học</a>
+    </div>
+  <% } else { %>
+    <div class="mc-list">
+      <% courses.forEach(function(course) {
+        const learnHref = course.nextLessonId
+          ? `/learn/${course.id}/${course.nextLessonId}`
+          : `/courses/${course.id}`;
+        const isDone = course.progress >= 80;
+      %>
+        <div class="mc-card">
+          <div class="mc-thumb">
+            <% if (course.banner) { %>
+              <img src="<%= course.banner %>" alt="<%= course.name %>">
+            <% } else { %>
+              <div class="mc-thumb-gradient" data-hash="<%= course.id % 6 %>">
+                <%= course.name %>
+              </div>
+            <% } %>
+          </div>
+
+          <div class="mc-info">
+            <div>
+              <div class="mc-name" title="<%= course.name %>"><%= course.name %></div>
+              <div class="mc-enrolled-date">
+                Đăng ký ngày <%= new Date(course.enrolledAt).toLocaleDateString('vi-VN') %>
+              </div>
+
+              <div class="mc-progress-row">
+                <div class="mc-progress-bar">
+                  <div
+                    class="mc-progress-fill <%= isDone ? 'done' : '' %>"
+                    style="--prog: <%= course.progress || 0 %>%; width: var(--prog);"
+                  ></div>
+                </div>
+                <span class="mc-progress-text">
+                  <%= course.completedLessons %>/<%= course.totalLessons %> bài
+                  (<%= course.progress %>%)
+                </span>
+              </div>
+            </div>
+
+            <div class="mc-action-group">
+              <% if (isDone) { %>
+                <!-- Nút nhận chứng chỉ (Chỉ hiện khi isDone = true) -->
+                <!-- Lưu ý: Bạn cần tạo route /certificate/:id ở backend sau này -->
+                <a href="/certificate/<%= course.id %>" class="mc-cert-btn" title="Xem chứng chỉ của bạn">
+                  🏆 Nhận chứng chỉ
+                </a>
+                
+                <!-- Nút ôn tập (Đổi text từ Hoàn thành sang Ôn tập) -->
+                <a href="<%= learnHref %>" class="mc-cta done">
+                  ✓ Đã hoàn thành
+                </a>
+              <% } else { %>
+                <!-- Nút tiếp tục học (Dành cho khóa chưa hoàn thành) -->
+                <a href="<%= learnHref %>" class="mc-cta">
+                  <% if (course.completedLessons === 0) { %>
+                    Bắt đầu học
+                  <% } else { %>
+                    Tiếp tục học
+                  <% } %>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

@@ -42,6 +42,34 @@ const userModel = {
       [id]
     );
   },
+
+  /**
+   * Cập nhật thông tin profile (email, avatar)
+   */
+  updateProfile: async (id, { email, avatar }) => {
+    let sql = 'UPDATE users SET email = ?';
+    const params = [email];
+
+    if (avatar) {
+      sql += ', avatar = ?';
+      params.push(avatar);
+    }
+
+    sql += ' WHERE id = ?';
+    params.push(id);
+
+    await database.execute(sql, params);
+  },
+
+  /**
+   * Đổi mật khẩu
+   */
+  updatePassword: async (id, newPassword) => {
+    await database.execute(
+      'UPDATE users SET password = ? WHERE id = ?',
+      [newPassword, id]
+    );
+  },
 };
 
 module.exports = userModel;

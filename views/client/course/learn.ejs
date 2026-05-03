@@ -1,0 +1,435 @@
+<link rel="stylesheet" href="/client/assets/css/learn.css">
+
+<div class="learn-wrap">
+
+  <!-- ========== MAIN COLUMN ========== -->
+  <main class="learn-main"> <!-- Sửa div thành thẻ main mang tính semantic hơn -->
+
+    <!-- Lesson header -->
+    <header class="lesson-header">
+      <div class="lesson-header-info">
+        <div class="lesson-breadcrumb"><%= course.name %></div>
+        <h1 class="lesson-title" style="margin:0;"><%= lesson.name %></h1> <!-- Đổi thành h1 thay vì div -->
+      </div>
+      <button
+        id="complete-btn"
+        class="complete-btn <%= lessonProgress && lessonProgress.isCompleted ? 'is-done' : '' %>"
+        data-lesson-id="<%= lesson.id %>"
+        data-course-id="<%= course.id %>"
+        <%= lessonProgress && lessonProgress.isCompleted ? 'disabled' : '' %>
+        aria-label="<%= lessonProgress && lessonProgress.isCompleted ? 'Bài học đã hoàn thành' : 'Đánh dấu hoàn thành bài học' %>"
+      >
+        <%= lessonProgress && lessonProgress.isCompleted ? 'Đã hoàn thành' : 'Đánh dấu hoàn thành' %>
+      </button>
+    </header>
+
+    <!-- Video player (only for video mode) -->
+    <% if (lesson.learnMode === 'video') { %>
+      <div class="learn-player">
+        <div class="video-wrapper">
+          <!-- Đổi Iframe thành thẻ Video -->
+          <video 
+            id="lesson-video" 
+            controls 
+            style="width: 100%; height: 100%; background: #000;"
+            src="<%= lesson.content %>"
+          >
+            Trình duyệt của bạn không hỗ trợ xem video.
+          </video>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Tab bar (Đã bổ sung a11y) -->
+    <nav class="learn-tab-bar" id="tab-bar" role="tablist" aria-label="Các mục nội dung bài học">
+      <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="pane-overview" data-tab="overview">
+        Tổng quan
+      </button>
+      <% if (lesson_documents.length > 0) { %>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="pane-documents" data-tab="documents">
+          Tài liệu&nbsp;<span class="doc-count">(<%= lesson_documents.length %>)</span>
+        </button>
+      <% } %>
+      <% if (questions.length > 0) { %>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="pane-quiz" data-tab="quiz">
+          Kiểm tra<% if (bestAttempt && bestAttempt.isPassed) { %>&nbsp;✓<% } %>
+        </button>
+      <% } %>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="pane-comments" data-tab="comments">
+        Thảo luận
+      </button>
+    </nav>
+
+    <!-- Tab body -->
+    <div class="learn-tab-body" id="tab-body">
+
+      <!-- ── Overview ── -->
+      <div class="tab-pane active" id="pane-overview" role="tabpanel">
+        <% if (lesson.learnMode === 'article') { %>
+          <article class="article-reader">
+            <h2><%= lesson.name %></h2> <!-- Sửa h1 thành h2 vì h1 đã dùng ở header -->
+            <!-- LƯU Ý BẢO MẬT: Đảm bảo biến lesson.content đã được sanitize (vd: dùng thư viện xss-clean hoặc DOMPurify) từ backend trước khi render -->
+            <%- lesson.content %>
+          </article>
+        <% } else { %>
+          <h2 style="color:#e2e8f0; margin-top:0;"><%= lesson.name %></h2>
+          <p style="color:#64748b; font-size:14px; line-height:1.7;">
+            Xem video bên trên để hoàn thành bài học này. Sau khi xem xong bạn có thể
+            nhấn <strong style="color:#94a3b8;">Đánh dấu hoàn thành</strong> để lưu tiến độ.
+          </p>
+          <% if (lessonProgress && lessonProgress.watchPercent > 0) { %>
+            <div style="margin-top:20px;">
+              <div style="font-size:13px; color:#64748b; margin-bottom:6px;">Tiến độ xem video</div>
+              <div class="progress-bar-bg" style="height:6px; background:#1e293b; border-radius:3px; overflow:hidden; max-width:300px;">
+                <div class="progress-bar-fill" 
+     style="--progress: <%= lessonProgress.watchPercent %>%; height:100%; width: var(--progress); background:#6366f1; border-radius:3px;">
+</div>
+              </div>
+              <div style="font-size:12px; color:#475569; margin-top:4px;"><%= lessonProgress.watchPercent %>%</div>
+            </div>
+          <% } %>
+        <% } %>
+      </div>
+
+      <!-- ── Documents ── -->
+      <% if (lesson_documents.length > 0) { %>
+        <div class="tab-pane" id="pane-documents" role="tabpanel">
+          <h3 style="color:#e2e8f0; margin-top:0; margin-bottom:18px;">Tài liệu đính kèm</h3>
+          <ul class="doc-list">
+            <% lesson_documents.forEach(function(doc) {
+              const iconMap = { pdf: '📄', docx: '📝', doc: '📝', xlsx: '📊', xls: '📊', zip: '📦', rar: '📦', pptx: '📊', mp4: '🎬' };
+              const icon = iconMap[doc.fileType] || '📎';
+            %>
+              <li class="doc-item">
+                <span class="doc-icon" aria-hidden="true"><%= icon %></span>
+                <div class="doc-info">
+                  <div class="doc-name" title="<%= doc.name %>"><%= doc.name %></div>
+                  <% if (doc.fileType) { %>
+                    <div class="doc-type"><%= doc.fileType %></div>
+                  <% } %>
+                </div>
+                <a class="doc-download" href="<%= doc.url %>" target="_blank" rel="noopener noreferrer" aria-label="Tải xuống <%= doc.name %>">Tải xuống</a>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+
+     <!-- ── Quiz (Giữ nguyên logic của bạn) ── -->
+      <!-- ── Quiz (Phần bài kiểm tra) ── -->
+<% if (questions && questions.length > 0) { %>
+  <div class="tab-pane" id="pane-quiz" role="tabpanel">
+    
+    <!-- 1. Bảng điểm tốt nhất (Chỉ hiện nếu user đã từng làm bài) -->
+    <% if (bestAttempt) { %>
+      <div class="quiz-best-score" id="best-score-card">
+        <div class="score-label">Điểm cao nhất của bạn</div>
+        <div class="score-big <%= bestAttempt.isPassed ? 'passed' : 'failed' %>">
+          <%= bestAttempt.score %>%
+        </div>
+        <% if (!bestAttempt.isPassed) { %>
+          <p style="color: #f87171; font-size: 13px; margin-top: 8px;">Chưa đạt (Yêu cầu <%= lesson.passScore %>%)</p>
+        <% } else { %>
+          <p style="color: #4ade80; font-size: 13px; margin-top: 8px;">Đạt yêu cầu (Yêu cầu <%= lesson.passScore %>%)</p>
+        <% } %>
+        
+        <!-- Nút làm lại bài được JS lắng nghe -->
+        <button class="retake-btn" id="retake-btn">Làm lại bài kiểm tra</button>
+      </div>
+    <% } %>
+
+    <!-- 2. Form làm bài kiểm tra -->
+    <!-- Form sẽ bị ẩn đi nếu user đã pass bài thi trước đó (ấn làm lại mới hiện) -->
+    <form id="quiz-form" data-total="<%= questions.length %>" <% if (bestAttempt && bestAttempt.isPassed) { %> style="display: none;" <% } %>>
+      
+      <div class="quiz-meta">
+        <span>Số câu hỏi: <strong><%= questions.length %></strong></span>
+        <span>Điểm qua môn: <strong><%= lesson.passScore %>%</strong></span>
+      </div>
+
+      <!-- Vòng lặp in ra danh sách câu hỏi -->
+      <% questions.forEach(function(q, i) { %>
+        <div class="question-block" id="opts-<%= i %>">
+          <div class="question-text">Câu <%= i + 1 %>: <%= q.content %></div>
+          
+          <div class="answer-options">
+            <% q.answers.forEach(function(ans, ai) { %>
+              <!-- Thuộc tính data-ai rất quan trọng để JS so sánh đáp án đúng/sai -->
+              <label class="answer-label" data-ai="<%= ai %>">
+                <input type="radio" name="q_<%= i %>" value="<%= ai %>">
+                <%= ans %>
+              </label>
+            <% }) %>
+          </div>
+        </div>
+      <% }) %>
+
+      <!-- Banner kết quả sau khi nộp bài (JS sẽ điền nội dung vào đây) -->
+      <div id="quiz-result-banner" class="quiz-result-banner" style="display: none;"></div>
+
+      <button type="submit" class="quiz-submit-btn" id="quiz-submit">Nộp bài</button>
+    </form>
+
+  </div>
+<% } %>
+
+      <!-- ── Comments (ĐÃ NÂNG CẤP GIAO DIỆN) ── -->
+      <div class="tab-pane" id="pane-comments" role="tabpanel">
+
+        <!-- 1. Khung nhập bình luận mới -->
+        <% if (typeof user !== 'undefined' && user) { %>
+          <div class="comment-form-area">
+            <div class="comment-input-wrapper">
+              
+              <!-- Avatar người dùng hiện tại -->
+              <div class="current-user-avatar">
+                <% if (user.avatar) { %>
+                  <img src="<%= user.avatar %>" alt="Avatar">
+                <% } else { %>
+                  <div class="c-avatar-init"><%= user.username.charAt(0).toUpperCase() %></div>
+                <% } %>
+              </div>
+
+              <!-- Form nhập liệu auto-resize -->
+              <form id="comment-form" action="/learn/<%= course.id %>/<%= lesson.id %>/comments" method="POST">
+                <textarea 
+                  id="comment-textarea"
+                  name="content" 
+                  placeholder="Thêm bình luận của bạn..." 
+                  rows="1"
+                ></textarea>
+                
+                <!-- Nhóm nút bấm hành động -->
+                <div class="comment-form-actions">
+                  <button type="button" class="comment-cancel-btn" id="cancel-comment">Hủy</button>
+                  <button type="submit" class="comment-post-btn" id="submit-comment" disabled>Bình luận</button>
+                </div>
+              </form>
+              
+            </div>
+          </div>
+        <% } else { %>
+          <p style="color:#64748b; font-size:14px; margin-bottom:24px;">
+            <a href="/login" style="color:#6366f1; font-weight: 500;">Đăng nhập</a> để tham gia thảo luận.
+          </p>
+        <% } %>
+
+        <!-- 2. Danh sách bình luận đã có -->
+        <div class="comments-list">
+  <% if (typeof comments !== 'undefined' && comments.length === 0) { %>
+    <p style="color:#475569; font-size:14px;">Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+  <% } %>
+
+  <% 
+    // TẠO HÀM ĐỆ QUY TRONG EJS: Giúp render vô số cấp comment
+    const renderComment = function(cmt, isRoot) { 
+  %>
+    <div class="comment-item <%= isRoot ? 'parent-comment' : 'child-comment' %>" id="cmt-<%= cmt.id %>">
+      
+      <!-- Thông tin User -->
+      <div class="comment-meta">
+        <% if (cmt.avatar) { %>
+          <img src="<%= cmt.avatar %>" alt="" class="c-avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="c-avatar-init" style="display:none"><%= cmt.username.charAt(0).toUpperCase() %></div>
+        <% } else { %>
+          <div class="c-avatar-init"><%= cmt.username.charAt(0).toUpperCase() %></div>
+        <% } %>
+        <span class="c-username"><%= cmt.username %></span>
+        <span class="c-date"><%= new Date(cmt.createdAt).toLocaleDateString('vi-VN') %></span>
+      </div>
+
+      <% if (cmt.isDeleted) { %>
+        <p class="c-deleted">[Bình luận đã bị xóa]</p>
+      <% } else { %>
+        <!-- Nội dung Comment (Viết liền trên 1 dòng để tránh rớt chữ) -->
+        <p class="c-content"><% if (!isRoot && cmt.parentUsername) { %><strong style="color: #6366f1;">@<%= cmt.parentUsername %></strong> <% } %><%= cmt.content %></p>
+        
+        <!-- Nút Trả lời & Báo cáo CÓ Ở MỌI CẤP ĐỘ -->
+        <div class="c-actions">
+          <% if (typeof user !== 'undefined' && user) { %>
+            <button class="c-action-btn" onclick="toggleReply('<%= cmt.id %>')">Trả lời</button>
+            
+            <!-- KIỂM TRA QUYỀN SỞ HỮU ĐỂ HIỆN NÚT XÓA -->
+            <% if (user.username === cmt.username) { %>
+              <button class="c-action-btn" style="color: #ef4444;" onclick="deleteComment('<%= cmt.id %>')">Xóa</button>
+            <% } %>
+
+            <button class="c-action-btn" onclick="openReport('<%= cmt.id %>')">Báo cáo</button>
+          <% } %>
+        </div>
+
+        <!-- Form trả lời (ẩn mặc định) được nhúng vào MỌI comment -->
+        <% if (typeof user !== 'undefined' && user) { %>
+          <div class="reply-form-area" id="reply-<%= cmt.id %>" style="display:none; margin-top: 10px;">
+            <form action="/learn/<%= course.id %>/<%= lesson.id %>/comments" method="POST" onsubmit="submitReply(event, '<%= cmt.id %>')">
+              <input type="hidden" name="parentId" value="<%= cmt.id %>">
+              <textarea name="content" placeholder="Phản hồi đến <%= cmt.username %>..." rows="2" style="width: 100%; padding: 8px; border-radius: 6px;"></textarea>
+              <div style="margin-top: 8px; text-align: right;">
+                <button type="submit" class="reply-post-btn">Gửi câu trả lời</button>
+              </div>
+            </form>
+          </div>
+        <% } %>
+      <% } %>
+
+      <!-- GỌI LẠI HÀM NÀY (ĐỆ QUY) NẾU CÓ COMMENT CON BÊN TRONG -->
+      <% if (cmt.replies && cmt.replies.length > 0) { %>
+        <div class="replies-list <%= isRoot ? 'ml-root' : 'ml-child' %>" style="margin-top: 15px; border-left: 2px solid #1e293b; padding-left: 15px;">
+          <% cmt.replies.forEach(function(child) { %>
+            <% renderComment(child, false); %>
+          <% }); %>
+        </div>
+      <% } %>
+
+    </div>
+  <% } %>
+
+  <!-- KÍCH HOẠT HÀM CHO CÁC COMMENT CẤP 1 -->
+  <% if (typeof comments !== 'undefined') { %>
+    <% comments.forEach(function(rootComment) { %>
+      <% renderComment(rootComment, true); %>
+    <% }); %>
+  <% } %>
+</div>
+
+      </div>
+    </div><!-- /tab-body -->
+
+    <!-- Prev / Next navigation -->
+    <nav class="lesson-nav" aria-label="Điều hướng bài học">
+      <% if (prevLesson) { %>
+        <% if (prevLesson.status === 'locked') { %>
+          <span class="nav-btn ghost locked" aria-disabled="true">
+            ← <i class="fa-solid fa-lock"></i> <span style="overflow:hidden;text-overflow:ellipsis;"><%= prevLesson.name %></span>
+          </span>
+        <% } else { %>
+          <a class="nav-btn" href="/learn/<%= course.id %>/<%= prevLesson.id %>">
+            ← <span style="overflow:hidden;text-overflow:ellipsis;"><%= prevLesson.name %></span>
+          </a>
+        <% } %>
+      <% } else { %>
+        <span class="nav-btn ghost" aria-disabled="true">← Đây là bài đầu tiên</span>
+      <% } %>
+
+      <% if (nextLesson) { %>
+        <% if (nextLesson.status === 'locked') { %>
+          <span class="nav-btn ghost locked" aria-disabled="true">
+            <span style="overflow:hidden;text-overflow:ellipsis;"><%= nextLesson.name %></span> <i class="fa-solid fa-lock"></i> →
+          </span>
+        <% } else { %>
+          <a class="nav-btn" href="/learn/<%= course.id %>/<%= nextLesson.id %>">
+            <span style="overflow:hidden;text-overflow:ellipsis;"><%= nextLesson.name %></span> →
+          </a>
+        <% } %>
+      <% } else { %>
+        <span class="nav-btn ghost" aria-disabled="true">Đây là bài cuối →</span>
+      <% } %>
+    </nav>
+
+  </main><!-- /learn-main -->
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="learn-sidebar" aria-label="Danh sách bài học">
+    <!-- Nội dung Sidebar giữ nguyên của bạn -->
+    <div class="sidebar-head">
+      <h3>Nội dung khoá học</h3>
+      <%
+        let totalLessons = 0, completedLessons = 0;
+        course.units.forEach(u => u.lessons.forEach(l => {
+          totalLessons++;
+          if (l.isCompleted) completedLessons++;
+        }));
+      %>
+      <div class="sidebar-prog-txt"><%= completedLessons %>/<%= totalLessons %> bài đã hoàn thành</div>
+    </div>
+    <div class="sidebar-scroll">
+      <% course.units.forEach(function(unit, ui) { %>
+        <div class="unit-section">
+          <div class="unit-label" <%= unit.status === 'locked' ? 'style="opacity: 0.6;"' : '' %>>
+          Chương <%= ui + 1 %>: <%= unit.name %>
+          <% if (unit.status == 'locked') { %>
+            <i class="fa-solid fa-lock" style="font-size: 11px; margin-left: 6px; color: #64748b;" title="Chương này đang bị khóa"></i>
+          <% } %>
+        </div>
+          <% unit.lessons.forEach(function(l, li) { %>
+            <% if (l.status == 'locked') { %>
+              <!-- NẾU BÀI HỌC BỊ KHÓA: Dùng thẻ div thay vì thẻ a, thêm class 'locked' -->
+              <div
+                class="lesson-link locked"
+                title="<%= l.name %> (Chưa mở khóa)"
+                style="opacity: 0.6; cursor: not-allowed;"
+              >
+                <span class="l-status-icon">
+                  <i class="fa-solid fa-lock" style="color: #64748b;"></i>
+                </span>
+                <span class="l-name">
+                  <%= ui + 1 %>.<%= li + 1 %> <%= l.name %>
+                  <div class="l-mode-badge"><%= l.learnMode === 'video' ? '▶ Video' : '📄 Bài viết' %></div>
+                </span>
+              </div>
+            <% } else { %>
+              <!-- NẾU BÀI HỌC ĐÃ MỞ: Giữ nguyên logic thẻ a của bạn -->
+              <a
+                href="/learn/<%= course.id %>/<%= l.id %>"
+                class="lesson-link <%= l.id === lesson.id ? 'active' : '' %>"
+                title="<%= l.name %>"
+              >
+                <span class="l-status-icon">
+                  <% if (l.isCompleted) { %>
+                    <i class="fas fa-check-circle done" style="color: #10b981;"></i>
+                  <% } else { %>
+                    <i class="far fa-circle todo" style="color: #475569;"></i>
+                  <% } %>
+                </span>
+                <span class="l-name">
+                  <%= ui + 1 %>.<%= li + 1 %> <%= l.name %>
+                  <div class="l-mode-badge"><%= l.learnMode === 'video' ? '▶ Video' : '📄 Bài viết' %></div>
+                </span>
+              </a>
+            <% } %>
+          <% }) %>
+        </div>
+      <% }) %>
+    </div>
+  </aside>
+
+</div><!-- /learn-wrap -->
+
+<!-- Report modal -->
+<div class="report-overlay" id="report-overlay" style="display:none;">
+  <div class="report-modal">
+    <h3>Báo cáo bình luận</h3>
+    <textarea id="report-reason" placeholder="Nhập lý do báo cáo..." rows="4"></textarea>
+    <div class="report-modal-actions">
+      <button class="report-cancel-btn" onclick="closeReport()">Huỷ</button>
+      <button class="report-send-btn" onclick="submitReport()">Gửi báo cáo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script id="learn-config-data" type="application/json">
+  <%- JSON.stringify({
+    courseId: (typeof course !== 'undefined' && course) ? course.id : null,
+    lessonId: (typeof lesson !== 'undefined' && lesson) ? lesson.id : null,
+    learnMode: (typeof lesson !== 'undefined' && lesson) ? lesson.learnMode : "",
+    isCompleted: (typeof lessonProgress !== 'undefined' && lessonProgress && lessonProgress.isCompleted) ? true : false,
+    watchPercent: (typeof lessonProgress !== 'undefined' && lessonProgress) ? lessonProgress.watchPercent : 0
+  }) %>
+</script>
+
+<!-- 2. Parse data ra biến Global (window.LEARN_CONFIG) -->
+<script>
+  try {
+    const configText = document.getElementById('learn-config-data').textContent;
+    window.LEARN_CONFIG = JSON.parse(configText);
+  } catch (error) {
+    console.error("Lỗi khi nạp cấu hình LEARN_CONFIG:", error);
+    window.LEARN_CONFIG = { courseId: null, lessonId: null, learnMode: "", isCompleted: false };
+  }
+</script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<!-- 3. CUỐI CÙNG mới tải file JS xử lý (để file JS có thể lấy được dữ liệu đã sinh ra ở bước 2) -->
+<script src="/client/assets/js/learn.js"></script>

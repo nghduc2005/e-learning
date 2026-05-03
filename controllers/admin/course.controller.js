@@ -237,11 +237,12 @@ export const courseController = {
       if (!course) return res.redirect("/admin/course/list");
 
       const reviews = await reviewService.getReviewsByCourseId(courseId);
-
+      console.log(reviews);
+      
       const avgRating = reviews.length > 0
         ? (reviews.reduce((sum, r) => sum + r.ratingNum, 0) / reviews.length).toFixed(1)
         : 0;
-
+      console.log(avgRating);
       res.render("admin/reviewManage", {
         title: `Quản lý đánh giá – ${course.name}`,
         course,

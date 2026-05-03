@@ -1,19 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nền tảng học trực tuyến – khám phá hàng trăm khoá học chất lượng cao">
+  <title><%= typeof title !== 'undefined' ? title : 'E-learn' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/client/assets/css/style.css">
-  <title>Doc</title>
+  <%- style %>
 </head>
 <body>
-  <header>
-    <h1>Header</h1>
-  </header>
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-brand" id="nav-logo">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-text">E-learn</span>
+      </a>
+
+      <div class="nav-links" id="nav-links">
+        <a href="/" class="nav-link active">Trang chủ</a>
+        <a href="#courses-section" class="nav-link">Khoá học</a>
+      </div>
+
+      <div class="nav-actions">
+        <% if (typeof user !== 'undefined' && user) { %>
+          <div class="user-menu" id="user-menu">
+            <button class="user-avatar-btn" id="user-avatar-btn" aria-label="Tài khoản">
+              <% if (user.avatar) { %>
+                <img src="<%= user.avatar %>" alt="Avatar" class="user-avatar"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <span class="user-avatar user-avatar--initial" style="display:none">
+                  <%= user.username.charAt(0).toUpperCase() %>
+                </span>
+              <% } else { %>
+                <span class="user-avatar user-avatar--initial">
+                  <%= user.username.charAt(0).toUpperCase() %>
+                </span>
+              <% } %>
+              <span class="user-name"><%= user.username %></span>
+            </button>
+            <div class="user-dropdown" id="user-dropdown">
+              <a href="/profile" class="dropdown-item">👤 Hồ sơ</a>
+              <a href="/my-courses" class="dropdown-item">📚 Khoá học của tôi</a>
+              <hr class="dropdown-divider">
+              <form action="/logout" method="POST">
+                <button type="submit" class="dropdown-item logout-btn">🚪 Đăng xuất</button>
+              </form>
+            </div>
+          </div>
+        <% } else { %>
+          <a href="/login" class="btn btn-ghost" id="btn-login">Đăng nhập</a>
+          <a href="/register" class="btn btn-primary" id="btn-register">Đăng ký</a>
+        <% } %>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main>
     <%- body %>
-  <footer>
-    <h1>Footer</h1>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-text">E-learn</span>
+        <p class="footer-tagline">Học không giới hạn – Phát triển không ngừng</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Nền tảng</h4>
+          <a href="/">Trang chủ</a>
+          <a href="#courses-section">Khoá học</a>
+        </div>
+        <div class="footer-col">
+          <h4>Hỗ trợ</h4>
+          <a href="#">Trung tâm trợ giúp</a>
+          <a href="#">Liên hệ</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 E-learn. Quảng cáo chỉ mang tính chất minh họa.</p>
+    </div>
   </footer>
+
   <script src="/client/assets/js/script.js"></script>
+  <%- script %>
 </body>
 </html>

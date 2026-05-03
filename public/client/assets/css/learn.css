@@ -1,0 +1,768 @@
+/* ===== Learn page – full-viewport layout ===== */
+body  { display: flex; flex-direction: column; height: 100vh; background: #0f172a; }
+main  { flex: 1; padding: 0 !important; }
+.footer { display: none !important; }
+.navbar { flex-shrink: 0; }
+
+/* ===== Outer wrapper ===== */
+.learn-wrap {
+  display: flex;
+  align-items: flex-start; /* Quan trọng: Không cho sidebar bị kéo giãn bằng chiều cao toàn trang */
+  width: 100%;
+  max-width: 1600px; /* Tùy chọn: Giới hạn chiều rộng tổng thể cho màn hình siêu lớn */
+  margin: 0 auto;
+}
+
+/* ===== Main column ===== */
+.learn-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0f172a;
+  min-width: 0; /* Tránh lỗi content làm phình bề ngang flexbox */
+  /* XÓA overflow: hidden; */
+}
+
+/* ===== Lesson header bar ===== */
+.lesson-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 24px;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+.lesson-header-info { flex: 1; min-width: 0; }
+.lesson-breadcrumb   { font-size: 11px; color: #64748b; margin-bottom: 2px; }
+.lesson-title        { font-size: 15px; font-weight: 600; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.complete-btn {
+  flex-shrink: 0;
+  padding: 7px 18px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.complete-btn:hover        { background: #4f46e5; }
+.complete-btn.is-done      { background: #166534; color: #4ade80; cursor: default; }
+.complete-btn.is-done::before { content: '✓ '; }
+
+/* ===== Video player ===== */
+.learn-player {
+  flex-shrink: 0;
+  width: 100%;
+  /* Bỏ nền đen tuyền (background: #000) thay bằng màu nền chung của web */
+  background: #0f172a; 
+  display: flex;
+  justify-content: center; /* Căn giữa video nếu màn hình quá rộng */
+  /* Thêm chút khoảng cách trên/dưới giống ảnh mẫu để thiết kế thoáng hơn */
+  padding: 20px 24px; 
+}
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  /* ĐIỂM MẤU CHỐT: Giới hạn chiều rộng tối đa (khoảng 900px - 1024px là đẹp) */
+  max-width: 960px; 
+  /* Sử dụng cú pháp hiện đại, tự động tính chiều cao, bỏ hoàn toàn padding-bottom */
+  aspect-ratio: 16 / 9; 
+  margin: 0 auto;
+  
+  /* (Tuỳ chọn) Bo góc và đổ bóng nhẹ giống các UI hiện đại */
+  border-radius: 8px;
+  overflow: hidden; 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.video-wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+/* ===== Tab bar ===== */
+.learn-tab-bar {
+  display: flex;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.learn-tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 11px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.tab-btn:hover  { color: #94a3b8; }
+.tab-btn.active { color: #e2e8f0; border-bottom-color: #6366f1; }
+
+/* ===== Tab content area ===== */
+.learn-tab-body {
+  padding: 28px;
+  color: #cbd5e1;
+  /* XÓA flex: 1 1 auto, min-height, overflow-y: auto */
+  /* Bây giờ nó chỉ là một div bình thường, nội dung dài bao nhiêu nó dài bấy nhiêu */
+}
+.tab-pane         { display: none; }
+.tab-pane.active  { display: block; }
+
+/* ===== Article reader ===== */
+.article-reader {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  color: #1e293b;
+  border-radius: 10px;
+  padding: 40px 48px;
+  line-height: 1.8;
+  font-size: 16px;
+}
+.article-reader h1 { margin-top: 0; }
+
+/* ===== Documents ===== */
+.doc-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+.doc-icon { font-size: 22px; flex-shrink: 0; }
+.doc-info { flex: 1; min-width: 0; }
+.doc-name { font-weight: 500; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-type { font-size: 11px; color: #64748b; text-transform: uppercase; margin-top: 2px; }
+.doc-download {
+  padding: 6px 14px;
+  background: #334155;
+  color: #93c5fd;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.doc-download:hover { background: #475569; }
+
+/* ===== Quiz ===== */
+.quiz-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #94a3b8;
+}
+.quiz-meta strong { color: #e2e8f0; }
+.pass-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.pass-badge.passed { background: #14532d33; color: #4ade80; border: 1px solid #166534; }
+.pass-badge.failed { background: #450a0a33; color: #f87171; border: 1px solid #7f1d1d; }
+
+.quiz-best-score {
+  padding: 24px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.score-big { font-size: 56px; font-weight: 700; line-height: 1; }
+.score-big.passed { color: #4ade80; }
+.score-big.failed { color: #f87171; }
+.score-label { color: #64748b; font-size: 14px; margin-top: 6px; }
+
+.retake-btn {
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: #334155;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.retake-btn:hover { background: #475569; }
+
+.question-block {
+  padding: 18px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+.question-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #e2e8f0;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.answer-options { display: flex; flex-direction: column; gap: 8px; }
+.answer-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #94a3b8;
+  transition: border-color 0.15s, color 0.15s;
+}
+.answer-label:hover  { border-color: #6366f1; color: #e2e8f0; }
+.answer-label input  { accent-color: #6366f1; flex-shrink: 0; }
+.answer-label.correct { border-color: #22c55e !important; background: #14532d22; color: #4ade80; }
+.answer-label.wrong   { border-color: #ef4444 !important; background: #450a0a22; color: #f87171; }
+.answer-label.selected-correct { border-color: #22c55e !important; background: #14532d44; color: #4ade80; }
+.answer-label.selected-wrong   { border-color: #ef4444 !important; background: #450a0a44; color: #f87171; }
+
+.quiz-submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s;
+}
+.quiz-submit-btn:hover    { background: #4f46e5; }
+.quiz-submit-btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+
+.quiz-result-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-weight: 600;
+}
+.quiz-result-banner.passed { background: #14532d33; color: #4ade80; border: 1px solid #166534; }
+.quiz-result-banner.failed { background: #450a0a33; color: #f87171; border: 1px solid #7f1d1d; }
+
+/* ===== Comments ===== */
+/* ===== Form nhập bình luận (Phong cách hiện đại) ===== */
+.comment-form-area { margin-bottom: 32px; }
+
+.comment-input-wrapper {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* Avatar người dùng hiện tại */
+.current-user-avatar img {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.current-user-avatar .c-avatar-init {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+}
+
+/* Khung form */
+#comment-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ô nhập liệu như Youtube (chỉ có gạch dưới) */
+#comment-form textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+  font-size: 14px;
+  padding: 8px 0;
+  resize: none; /* Tắt kéo thả mặc định */
+  overflow: hidden; /* Ẩn thanh cuộn để JS tự động kéo dài */
+  font-family: inherit;
+  transition: border-color 0.2s;
+  min-height: 36px;
+}
+#comment-form textarea:focus {
+  outline: none;
+  border-bottom: 2px solid #e2e8f0; /* Sáng lên khi click vào */
+}
+
+/* Nhóm nút bấm (Ẩn mặc định, hiện khi active) */
+.comment-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  display: none; /* Dùng JS để show ra */
+}
+#comment-form.is-active .comment-form-actions {
+  display: flex;
+}
+
+/* Nút Hủy */
+.comment-cancel-btn {
+  background: transparent;
+  color: #e2e8f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.comment-cancel-btn:hover { background: #334155; }
+
+/* Nút Bình luận */
+.comment-post-btn {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px; /* Bo tròn mượt mà */
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+.comment-post-btn:hover:not(:disabled) { background: #4f46e5; }
+.comment-post-btn:disabled {
+  background: #334155;
+  color: #64748b;
+  cursor: not-allowed;
+}
+.c-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.c-avatar-init {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.c-username { font-weight: 600; color: #e2e8f0; font-size: 14px; }
+.c-date     { color: #475569; font-size: 12px; }
+.c-content  { color: #94a3b8; font-size: 14px; line-height: 1.65; }
+.c-deleted  { color: #475569; font-style: italic; font-size: 14px; }
+.c-actions  { display: flex; gap: 14px; margin-top: 8px; }
+.c-action-btn {
+  background: none;
+  border: none;
+  color: #475569;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+.c-action-btn:hover { color: #94a3b8; }
+
+.comment-replies { margin-left: 44px; border-left: 2px solid #1e293b; padding-left: 16px; margin-top: 10px; }
+.reply-form-area  { display: none; margin-top: 10px; }
+.reply-form-area textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.reply-form-area textarea:focus { outline: none; border-color: #6366f1; }
+.reply-post-btn {
+  margin-top: 6px;
+  padding: 6px 14px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ===== Report modal ===== */
+.report-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+}
+.report-modal {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 24px;
+  width: 400px;
+  max-width: 90vw;
+}
+.report-modal h3 { color: #e2e8f0; margin: 0 0 16px; font-size: 16px; }
+.report-modal textarea {
+  width: 100%;
+  padding: 10px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 13px;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.report-modal textarea:focus { outline: none; border-color: #6366f1; }
+.report-modal-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end; }
+.report-cancel-btn {
+  padding: 7px 16px;
+  background: #334155;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.report-send-btn {
+  padding: 7px 16px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ===== Prev/Next navigation ===== */
+.lesson-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  background: #1e293b;
+  border-top: 1px solid #334155;
+  flex-shrink: 0; 
+  gap: 12px;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  background: #334155;
+  color: #e2e8f0;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+  max-width: 260px;
+  transition: background 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-btn:hover  { background: #475569; }
+.nav-btn.ghost  { opacity: 0.35; pointer-events: none; }
+
+/* ===== Sidebar ===== */
+.learn-sidebar {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: #1e293b;
+  border-left: 1px solid #334155;
+  
+  /* --- BIẾN SIDEBAR THÀNH KHỐI STICKY ĐỘC LẬP --- */
+  position: sticky; 
+  top: 0; /* Hoặc chiều cao navbar của bạn, ví dụ: top: 60px; */
+  
+  /* Chiều cao của sidebar phải được khóa chặt bằng 100vh (hoặc 100vh - chiều cao navbar) */
+  height: 100vh; /* Ví dụ: calc(100vh - 60px) */
+}
+.sidebar-head {
+  padding: 14px 20px;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0;
+}
+.sidebar-head h3  { color: #e2e8f0; font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+.sidebar-prog-txt { font-size: 12px; color: #64748b; }
+
+.sidebar-head {
+  padding: 14px 20px;
+  border-bottom: 1px solid #334155;
+  flex-shrink: 0; /* Đảm bảo phần tiêu đề "Nội dung khóa học" luôn cố định ở trên cùng */
+}
+
+/* Phần này sẽ tự động hiện thanh cuộn mượt mà */
+.sidebar-scroll { 
+  flex: 1; 
+  overflow-y: auto; 
+  /* Tùy chỉnh thanh cuộn cho đẹp */
+  scrollbar-width: thin;
+  scrollbar-color: #334155 transparent;
+}
+
+/* Tùy chỉnh thanh cuộn cho Chrome/Safari/Edge */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent; 
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #334155; 
+  border-radius: 4px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #475569; 
+}
+
+.unit-section    { }
+.unit-label      {
+  padding: 9px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  background: #162033;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.lesson-link {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px 18px;
+  text-decoration: none;
+  color: #94a3b8;
+  gap: 10px;
+  font-size: 13px;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.lesson-link:hover   { background: #253348; color: #e2e8f0; }
+.lesson-link.active  { background: #1d3461; color: #93c5fd; border-left-color: #6366f1; }
+.l-status-icon       { flex-shrink: 0; margin-top: 1px; font-size: 14px; }
+.l-status-icon .done { color: #22c55e; }
+.l-status-icon .todo { color: #334155; }
+.l-name              { flex: 1; line-height: 1.4; }
+.l-mode-badge        { font-size: 10px; color: #475569; margin-top: 3px; }
+
+/* ===== Toast notification ===== */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 9000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: #14532d; color: #4ade80; border: 1px solid #166534; }
+.toast.error   { background: #450a0a; color: #f87171; border: 1px solid #7f1d1d; }
+
+.comment-item {
+  padding: 20px 0;
+  border-bottom: 1px solid #1e293b; 
+}
+.comment-item:last-child { 
+  border-bottom: none; 
+}
+
+/* Kiểu chữ và màu sắc cho nội dung bình luận */
+.c-content {
+  color: #cbd5e1; /* Màu chữ sáng hơn để dễ đọc trên nền tối */
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  white-space: pre-wrap; /* Quan trọng: Giữ lại các ngắt dòng của người dùng */
+  word-break: break-word; /* Tránh tràn layout với các từ quá dài */
+}
+
+/* Định dạng cho tên người dùng và ngày tháng */
+.c-username {
+  font-weight: 600;
+  color: #f8fafc;
+  font-size: 14px;
+}
+.c-date {
+  color: #64748b;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+/* Phong cách cho vùng chứa avatar */
+.comment-meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.c-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+  border: 1px solid #334155; /* Thêm viền nhẹ cho avatar */
+}
+
+/* Tùy chỉnh các nút hành động (Trả lời, Báo cáo) */
+.c-actions {
+  display: flex;
+  gap: 16px;
+}
+.c-action-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+.c-action-btn:hover {
+  color: #e2e8f0;
+  text-decoration: underline;
+}
+
+/* Tinh chỉnh phần hiển thị khi bình luận bị xóa */
+.c-deleted {
+  color: #64748b;
+  font-style: italic;
+  background-color: #1e293b;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.child-comment {
+  padding: 12px 0; /* Thu nhỏ khoảng cách trên dưới so với comment cha */
+  border-bottom: 1px solid #1e293b; 
+}
+
+/* Bỏ đường kẻ ngang ở bình luận con cuối cùng trong một nhóm */
+.child-comment:last-child {
+  border-bottom: none;
+}
+
+/* Thu nhỏ font size và avatar của bình luận con một chút (Tùy chọn cho đẹp) */
+.child-comment .c-avatar,
+.child-comment .c-avatar-init {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+
+.child-comment .c-username {
+  font-size: 13px;
+}
+
+.child-comment .c-content {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.ml-root {
+  margin-left: 40px;
+}
+.ml-child {
+  margin-left: 15px;
+}
+
+body {
+  padding-top: var(--nav-h); /* Sử dụng biến CSS đã được định nghĩa trong style.css */
+}
+
+
+/* Đảm bảo Sidebar (nếu đang dùng sticky/fixed) cũng nằm dưới Navbar */
+.learn-sidebar {
+  top: var(--nav-h); /* Nếu sidebar dùng position: sticky */
+  height: calc(100vh - var(--nav-h)); /* Khóa chiều cao của Sidebar */
+}
+
+.l-status-icon .done {
+    color: #10b981 !important; 
+    text-shadow: 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Màu xám cho bài chưa học */
+.l-status-icon .todo {
+    color: #475569 !important;
+}
+
+/* Làm nổi bật rõ ràng bài đang học (Active) */
+.lesson-link.active {
+    background-color: #1e293b !important;
+    border-left-color: #6366f1 !important;
+    font-weight: 600 !important;
+}
+
+/* Không cho phép màu của link active đè màu của tích xanh */
+.lesson-link.active .l-status-icon .done {
+    color: #10b981 !important; 
+}
+
+/* Giữ màu chữ tên bài học luôn sáng khi đang active */
+.lesson-link.active .l-name {
+    color: #e2e8f0 !important;
+}

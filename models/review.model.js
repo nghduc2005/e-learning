@@ -27,4 +27,20 @@ export const reviewModel = {
     );
     return result.affectedRows > 0;
   },
+
+  create: async (data) => {
+    const [result] = await database.execute(
+      `INSERT INTO reviews (courseId, userId, content, ratingNum) VALUES (?, ?, ?, ?)`,
+      [data.courseId, data.userId, data.content, data.ratingNum]
+    );
+    return result.insertId;
+  },
+
+  findByUserAndCourse: async (userId, courseId) => {
+    const [rows] = await database.execute(
+      `SELECT id, content, ratingNum, createdAt FROM reviews WHERE userId = ? AND courseId = ?`,
+      [userId, courseId]
+    );
+    return rows[0] || null;
+  },
 };

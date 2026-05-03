@@ -204,5 +204,28 @@ export const commentModel = {
       [reportId]
     );
     return result.affectedRows > 0;
-  }
+  },
+
+  // Tạo bình luận mới (client)
+  create: async (userId, lessonId, content, parentId = null) => {
+    const [result] = await database.execute(
+      `INSERT INTO comments (userId, lessonId, content, parentId) VALUES (?, ?, ?, ?)`,
+      [userId, lessonId, content, parentId]
+    );
+    return result.insertId;
+  },
+
+  // Báo cáo bình luận (client)
+  createReport: async (commentId, reporterId, reason) => {
+    const [result] = await database.execute(
+      `INSERT INTO report_comments (commentId, reporterId, reason) VALUES (?, ?, ?)`,
+      [commentId, reporterId, reason]
+    );
+    return result.insertId;
+  },
+
+  findById: async (id) => {
+    const [rows] = await database.execute(`SELECT * FROM comments WHERE id = ?`, [id]);
+    return rows[0] || null;
+  },
 };

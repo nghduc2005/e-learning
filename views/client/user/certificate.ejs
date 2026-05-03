@@ -1,0 +1,47 @@
+<style>
+  .cert-wrapper {
+    display: flex; justify-content: center; align-items: center;
+    padding: 40px 20px; background: var(--bg-surface); min-height: 80vh;
+  }
+  .cert-box {
+    width: 800px; padding: 60px; background: white;
+    border: 15px solid #1e293b; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative;
+    color: #1e293b; font-family: 'Georgia', serif;
+  }
+  .cert-logo { font-size: 40px; margin-bottom: 10px; }
+  .cert-title { font-size: 48px; font-weight: bold; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 30px; color: #ca8a04; }
+  .cert-text { font-size: 20px; margin-bottom: 20px; color: #475569; }
+  .cert-name { font-size: 40px; font-weight: bold; border-bottom: 2px solid #cbd5e1; display: inline-block; padding: 0 40px 10px; margin-bottom: 30px; font-style: italic; }
+  .cert-course { font-size: 32px; font-weight: bold; color: #0f172a; margin-bottom: 40px; }
+  .cert-footer { display: flex; justify-content: space-between; margin-top: 60px; font-size: 16px; font-family: 'Inter', sans-serif;}
+  .signature-line { border-top: 1px solid #1e293b; padding-top: 10px; width: 200px; margin: 0 auto; }
+  body {
+  padding-top: var(--nav-h); /* Sử dụng biến CSS đã được định nghĩa trong style.css */
+}
+</style>
+
+<div class="cert-wrapper">
+  <div class="cert-box">
+    <div class="cert-logo">⚡ E-learn</div>
+    <div class="cert-title">Chứng Chỉ Hoàn Thành</div>
+    
+    <div class="cert-text">Chứng nhận học viên:</div>
+    <div class="cert-name"><%= user.fullname || user.username %></div>
+    
+    <div class="cert-text">Đã xuất sắc hoàn thành khoá học:</div>
+    <div class="cert-course"><%= course.name %></div>
+    
+    <div class="cert-footer">
+      <div>
+        <p>Cấp ngày: <%= new Date(issueDate).toLocaleDateString('vi-VN') %></p>
+        <p>Thành tích: Đạt <%= percent %>%</p>
+      </div>
+      <div>
+        <div class="signature-line">
+          <strong>Giám đốc Đào tạo</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

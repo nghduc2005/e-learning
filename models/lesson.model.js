@@ -149,7 +149,6 @@ export const lessonModel = {
       }));
 
       lesson.questionsList = questionsWithAnswers;
-      console.log(lesson);
       return lesson;
     },
 
@@ -245,5 +244,20 @@ export const lessonModel = {
     const query = `UPDATE lessons SET deletedAt = NULL WHERE id = ?`;
     const [result] = await database.execute(query, [id]);
     return result;
-  }
+  },
+  findFirstByCourseId: async (courseId) => {
+    const query = `
+      SELECT l.id
+      FROM unit_lessons ul
+      JOIN lessons l ON l.id = ul.lessonId
+      WHERE ul.curriculumId = (
+        SELECT curriculumId FROM courses WHERE id = ? AND deletedAt IS NULL
+      )
+      AND l.deletedAt IS NULL
+      ORDER BY ul.position ASC, ul.id ASC
+      LIMIT 1
+    `;
+    const [rows] = await database.execute(query, [courseId]);
+    return rows[0] || null;
+  },
 };

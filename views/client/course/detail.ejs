@@ -1,0 +1,982 @@
+<!-- ===== COURSE DETAIL PAGE ===== -->
+
+<!-- Hero / Banner -->
+<div class="cd-hero">
+  <% if (course.banner) { %>
+    <div class="cd-hero-img" style="background-image:url('<%= course.banner %>')"></div>
+  <% } else { %>
+    <div class="cd-hero-gradient" data-hash="<%= course.id % 6 %>"></div>
+  <% } %>
+  <div class="cd-hero-overlay"></div>
+
+  <div class="cd-hero-content">
+    <div class="cd-header-top">
+      <a href="/" class="cd-back-link" id="cd-back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Quay lại trang chủ
+      </a>
+      <div class="cd-status-badge cd-status-badge--<%= course.status %>">
+        <span class="cd-status-dot"></span>
+        <%= course.status === 'active' ? 'Đang mở đăng ký' : 'Tạm khoá' %>
+      </div>
+    </div>
+    <h1 class="cd-title"><%= course.name %></h1>
+    <!-- <p class="cd-subtitle"><%= course.shortDescription || 'Khoá học chất lượng cao dành cho bạn.' %></p> -->
+
+    <div class="cd-meta-row">
+      <div class="cd-meta-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span><strong><%= course.studentCount %></strong> học viên</span>
+      </div>
+      <% if (course.avgRating) { %>
+        <div class="cd-meta-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span><strong><%= course.avgRating.toFixed(1) %></strong> (<%= course.reviewCount %> đánh giá)</span>
+        </div>
+      <% } %>
+      <div class="cd-meta-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Tạo ngày <strong><%= new Date(course.createdAt).toLocaleDateString('vi-VN') %></strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN BODY ===== -->
+<div class="cd-body">
+  <div class="cd-container">
+
+    <!-- Left: Curriculum -->
+    <main class="cd-main">
+
+      <!-- Stats bar -->
+      <div class="cd-stats-bar">
+        <div class="cd-stat">
+          <span class="cd-stat-num"><%= course.units.length %></span>
+          <span class="cd-stat-label">Chương</span>
+        </div>
+        <div class="cd-stat-divider"></div>
+        <div class="cd-stat">
+          <span class="cd-stat-num"><%= course.units.reduce((s, u) => s + u.lessons.length, 0) %></span>
+          <span class="cd-stat-label">Bài học</span>
+        </div>
+        <div class="cd-stat-divider"></div>
+        <div class="cd-stat">
+          <span class="cd-stat-num"><%= course.studentCount %></span>
+          <span class="cd-stat-label">Học viên</span>
+        </div>
+        <% if (course.avgRating) { %>
+          <div class="cd-stat-divider"></div>
+          <div class="cd-stat">
+            <span class="cd-stat-num"><%= course.avgRating.toFixed(1) %> ⭐</span>
+            <span class="cd-stat-label">Điểm đánh giá</span>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Course description (HTML) -->
+      <% if (course.description) { %>
+        <section class="cd-description" id="cd-description">
+          <h2 class="cd-section-title">Giới thiệu khoá học</h2>
+          <div class="cd-prose">
+            <%- course.description %>
+          </div>
+        </section>
+      <% } %>
+
+      <!-- Curriculum accordion -->
+      <section class="cd-curriculum" id="cd-curriculum">
+        <h2 class="cd-section-title">Nội dung khoá học</h2>
+
+        <% if (course.units.length === 0) { %>
+          <div class="cd-empty">
+            <span class="cd-empty-icon">📋</span>
+            <p>Nội dung khoá học đang được chuẩn bị.</p>
+          </div>
+        <% } else { %>
+          <div class="cd-accordion" id="cd-accordion">
+            <% course.units.forEach(function(unit, ui) { %>
+              <div class="cd-unit" id="unit-<%= unit.id %>">
+                <button
+                  class="cd-unit-header <%= ui === 0 ? 'open' : '' %>"
+                  aria-expanded="<%= ui === 0 ? 'true' : 'false' %>"
+                  data-unit="unit-body-<%= unit.id %>"
+                >
+                  <div class="cd-unit-left">
+                    <span class="cd-unit-index"><%= ui + 1 %></span>
+                    <div>
+                      <span class="cd-unit-name"><%= unit.name %></span>
+                      <span class="cd-unit-count"><%= unit.lessons.length %> bài học</span>
+                    </div>
+                  </div>
+                  <svg class="cd-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+
+                <div class="cd-unit-body <%= ui === 0 ? 'open' : '' %>" id="unit-body-<%= unit.id %>">
+                  <% if (unit.lessons.length === 0) { %>
+                    <div class="cd-lesson-empty">Chưa có bài học nào trong chương này.</div>
+                  <% } else { %>
+                    <% unit.lessons.forEach(function(lesson, li) { %>
+                      <div class="cd-lesson-row <%= lesson.status === 'locked' ? 'cd-lesson-row--locked' : '' %>"
+                           id="lesson-row-<%= lesson.id %>">
+                        <div class="cd-lesson-icon">
+                          <% if (lesson.status === 'locked') { %>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                          <% } else if (lesson.learnMode === 'video') { %>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                          <% } else { %>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                          <% } %>
+                        </div>
+                        <div class="cd-lesson-info">
+                          <span class="cd-lesson-num"><%= ui + 1 %>.<%= li + 1 %></span>
+                          <span class="cd-lesson-name"><%= lesson.name %></span>
+                        </div>
+                        <div class="cd-lesson-tags">
+                          <span class="cd-tag cd-tag--mode"><%= lesson.learnMode === 'video' ? '▶ Video' : '📄 Bài đọc' %></span>
+                          <% if (lesson.status === 'locked') { %>
+                            <span class="cd-tag cd-tag--locked">Khoá</span>
+                          <% } %>
+                          <% if (lesson.passScore > 0) { %>
+                            <span class="cd-tag cd-tag--score">Trắc nghiệm</span>
+                          <% } %>
+                        </div>
+                      </div>
+                    <% }); %>
+                  <% } %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+      </section>
+
+      <!-- ===== REVIEWS SECTION ===== -->
+      <section class="cd-reviews" id="reviews-section">
+        <h2 class="cd-section-title">Đánh giá từ học viên</h2>
+
+        <!-- Rating Overview -->
+        <div class="rv-overview">
+          <div class="rv-score-box">
+            <span class="rv-big-score"><%= course.avgRating ? course.avgRating.toFixed(1) : '–' %></span>
+            <div class="rv-stars-row">
+              <% for (let s = 1; s <= 5; s++) { %>
+                <svg class="rv-star <%= (course.avgRating && s <= Math.round(course.avgRating)) ? 'rv-star--filled' : '' %>" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              <% } %>
+            </div>
+            <span class="rv-total"><%= reviews.length %> đánh giá</span>
+          </div>
+
+          <div class="rv-bars">
+            <% for (let star = 5; star >= 1; star--) { %>
+              <div class="rv-bar-row">
+                <span class="rv-bar-label"><%= star %> ⭐</span>
+                <% 
+                    let fillPercent = 0;
+                    if (reviews.length) {
+                      let count = ratingDist[star - 1] || 0;
+                      fillPercent = Math.round((count / reviews.length) * 100);
+                    }
+                  %>
+                  <div class="rv-bar-fill" style="--percent: <%= fillPercent %>%; width: var(--percent);"></div>
+                <span class="rv-bar-count"><%= ratingDist[star - 1] %></span>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Review Form (only if logged in & not yet reviewed) -->
+        <% if (typeof user !== 'undefined' && user && !userReview) { %>
+          <div class="rv-form-card" id="rv-form-card">
+            <h3 class="rv-form-title">Viết đánh giá của bạn</h3>
+            <form action="/courses/<%= course.id %>/review" method="POST" class="rv-form" id="rv-form">
+              <div class="rv-star-select" id="rv-star-select">
+                <span class="rv-star-label">Đánh giá:</span>
+                <div class="rv-star-group">
+                  <% for (let s = 1; s <= 5; s++) { %>
+                    <button type="button" class="rv-star-btn" data-value="<%= s %>" aria-label="<%= s %> sao">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                    </button>
+                  <% } %>
+                </div>
+                <input type="hidden" name="ratingNum" id="rv-rating-input" value="" required>
+              </div>
+              <textarea
+                name="content"
+                class="rv-textarea"
+                id="rv-textarea"
+                rows="3"
+                placeholder="Chia sẻ trải nghiệm học tập của bạn..."
+                maxlength="1000"
+              ></textarea>
+              <button type="submit" class="btn btn-primary rv-submit-btn" id="rv-submit-btn" disabled>
+                Gửi đánh giá
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              </button>
+            </form>
+          </div>
+        <% } else if (typeof user !== 'undefined' && user && userReview) { %>
+          <div class="rv-form-card rv-already">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Bạn đã đánh giá khoá học này (<strong><%= userReview.ratingNum %> ⭐</strong>)</span>
+          </div>
+        <% } else if (!user) { %>
+          <div class="rv-form-card rv-login-prompt">
+            <a href="/login" class="btn btn-ghost">Đăng nhập để đánh giá</a>
+          </div>
+        <% } %>
+
+        <!-- Reviews List -->
+        <% if (reviews.length > 0) { %>
+          <div class="rv-list" id="rv-list">
+            <% reviews.forEach(function(review) { %>
+              <div class="rv-item" id="review-<%= review.id %>">
+                <div class="rv-item-head">
+                  <% if (review.avatar) { %>
+                    <img src="<%= review.avatar %>" alt="<%= review.username %>" class="rv-avatar">
+                  <% } else { %>
+                    <span class="rv-avatar rv-avatar--initial"><%= review.username.charAt(0).toUpperCase() %></span>
+                  <% } %>
+                  <div class="rv-item-info">
+                    <span class="rv-username"><%= review.username %></span>
+                    <span class="rv-date"><%= review.createdAt %></span>
+                  </div>
+                  <div class="rv-item-stars">
+                    <% for (let s = 1; s <= 5; s++) { %>
+                      <svg class="rv-star-sm <%= s <= review.ratingNum ? 'rv-star--filled' : '' %>" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                    <% } %>
+                  </div>
+                </div>
+                <% if (review.content) { %>
+                  <p class="rv-content"><%= review.content %></p>
+                <% } %>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <div class="rv-empty">
+            <span class="rv-empty-icon">💬</span>
+            <p>Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+          </div>
+        <% } %>
+      </section>
+
+    </main>
+
+    <!-- Right: Enroll card -->
+    <aside class="cd-sidebar">
+  <div class="cd-enroll-card" id="cd-enroll-card">
+    <!-- 1. Hình ảnh đại diện khóa học -->
+    <% if (course.banner) { %>
+      <img src="<%= course.banner %>" alt="<%= course.name %>" class="cd-enroll-thumb">
+    <% } else { %>
+      <div class="cd-enroll-thumb cd-enroll-gradient" data-hash="<%= course.id % 6 %>">
+        <span class="cd-enroll-gradient-title"><%= course.name %></span>
+      </div>
+    <% } %>
+
+    <div class="cd-enroll-body">
+      <!-- 2. Logic Nút Đăng ký / Vào học -->
+      <% if (course.status === 'active') { %>
+        <% if (typeof user !== 'undefined' && user) { %>
+          
+          <% if (enroll) { %>
+            <!-- Trường hợp: Đã đăng ký -> Vào học -->
+            <a href="/learn/<%= course.id %>/<%= lessonId %>" class="btn btn-primary btn-enroll" id="btn-learn-<%= course.id %>">
+              Vào học
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          <% } else { %>
+            <!-- Trường hợp: Chưa đăng ký -> Hiện Form POST -->
+            <form action="/courses/<%= course.id %>/enroll" method="POST">
+              <input type="hidden" name="courseId" value="<%= course.id %>">
+              <button type="submit" class="btn btn-primary btn-enroll" id="btn-enroll-<%= course.id %>">
+                Đăng ký ngay
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </form>
+          <% } %>
+
+        <% } else { %>
+          <!-- Trường hợp: Chưa đăng nhập -->
+          <a href="/login" class="btn btn-primary btn-enroll" id="btn-login-enroll">
+            Đăng nhập để đăng ký
+          </a>
+          <a href="/register" class="btn btn-ghost btn-enroll-ghost" id="btn-register-enroll">Tạo tài khoản miễn phí</a>
+        <% } %>
+
+      <% } else { %>
+        <!-- Trường hợp: Khóa học bị khóa/ẩn -->
+        <button class="btn btn-locked btn-enroll" disabled id="btn-locked-<%= course.id %>">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Chưa mở đăng ký
+        </button>
+      <% } %>
+
+      <!-- 3. Danh sách đặc điểm (Features) -->
+      <ul class="cd-features">
+        <li>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span><%= course.units.reduce((s, u) => s + u.lessons.length, 0) %> bài học</span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span><%= course.units.length %> chương học</span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Học mọi lúc, mọi nơi</span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Chứng chỉ hoàn thành</span>
+        </li>
+      </ul>
+
+    </div> <!-- Kết thúc cd-enroll-body -->
+  </div> <!-- Kết thúc cd-enroll-card -->
+</aside>
+
+  </div><!-- end cd-container -->
+</div><!-- end cd-body -->
+
+<style>
+/* ===== COURSE DETAIL PAGE STYLES ===== */
+
+/* Hero */
+.cd-hero {
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: flex-end;
+  margin-top: var(--nav-h);
+  overflow: hidden;
+}
+.cd-hero-img {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(.55);
+}
+/* Palette matching homepage */
+.cd-hero-gradient[data-hash="0"] { position:absolute;inset:0;background:linear-gradient(135deg,#6366f1,#8b5cf6); }
+.cd-hero-gradient[data-hash="1"] { position:absolute;inset:0;background:linear-gradient(135deg,#0891b2,#06b6d4); }
+.cd-hero-gradient[data-hash="2"] { position:absolute;inset:0;background:linear-gradient(135deg,#7c3aed,#a78bfa); }
+.cd-hero-gradient[data-hash="3"] { position:absolute;inset:0;background:linear-gradient(135deg,#0f766e,#14b8a6); }
+.cd-hero-gradient[data-hash="4"] { position:absolute;inset:0;background:linear-gradient(135deg,#b45309,#f59e0b); }
+.cd-hero-gradient[data-hash="5"] { position:absolute;inset:0;background:linear-gradient(135deg,#be185d,#f472b6); }
+.cd-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.75) 0%, rgba(0,0,0,.3) 55%, transparent 100%);
+}
+.cd-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--sp-2xl) var(--sp-lg);
+  color: #fff;
+}
+.cd-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255,255,255,.85);
+  font-size: .85rem;
+  font-weight: 600;
+  transition: color var(--dur-fast), transform var(--dur-fast);
+  white-space: nowrap;
+}
+.cd-back-link:hover { color: #fff; transform: translateX(-3px); }
+
+.cd-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .4px;
+}
+
+.cd-header-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2xl);
+  align-items: flex-start;            /* Căn giữa theo trục dọc */
+  margin-bottom: var(--sp-md);    /* Đẩy khoảng cách xuống tiêu đề bên dưới */
+}
+.cd-status-badge--active { background: rgba(22,163,74,.25); border: 1px solid rgba(22,163,74,.5); }
+.cd-status-badge--locked { background: rgba(100,116,139,.25); border: 1px solid rgba(100,116,139,.5); }
+.cd-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cd-status-badge--active .cd-status-dot { background: #4ade80; animation: pulse 2s infinite; }
+.cd-status-badge--locked .cd-status-dot { background: #94a3b8; }
+
+.cd-title {
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -.8px;
+  margin-bottom: var(--sp-sm);
+}
+.cd-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,.82);
+  line-height: 1.65;
+  max-width: 680px;
+  margin-bottom: var(--sp-lg);
+}
+.cd-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-lg);
+}
+.cd-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .875rem;
+  color: rgba(255,255,255,.85);
+}
+.cd-meta-item strong { color: #fff; }
+
+/* Body layout */
+.cd-body { background: var(--bg-base); padding: var(--sp-2xl) var(--sp-lg); }
+.cd-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--sp-xl);
+  align-items: start;
+}
+
+/* Stats bar */
+.cd-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-lg) var(--sp-xl);
+  margin-bottom: var(--sp-xl);
+  box-shadow: var(--shadow-sm);
+}
+.cd-stat { text-align: center; }
+.cd-stat-num {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+.cd-stat-label { font-size: .78rem; color: var(--text-muted); font-weight: 500; }
+.cd-stat-divider { width: 1px; height: 36px; background: var(--border); margin: 0 var(--sp-sm); }
+
+/* Description / Prose */
+.cd-description {
+  margin-bottom: var(--sp-xl);
+}
+.cd-prose {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-xl);
+  box-shadow: var(--shadow-sm);
+  font-size: .9rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.cd-prose h1, .cd-prose h2, .cd-prose h3, .cd-prose h4 {
+  color: var(--text-primary);
+  margin-top: 1.5em;
+  margin-bottom: .5em;
+  line-height: 1.3;
+}
+.cd-prose h1 { font-size: 1.5rem; }
+.cd-prose h2 { font-size: 1.25rem; }
+.cd-prose h3 { font-size: 1.1rem; }
+.cd-prose h4 { font-size: 1rem; }
+.cd-prose p { margin-bottom: .8em; }
+.cd-prose ul, .cd-prose ol {
+  margin: .8em 0;
+  padding-left: 1.5em;
+}
+.cd-prose li { margin-bottom: .3em; }
+.cd-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  margin: 1em 0;
+}
+.cd-prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cd-prose a:hover { color: var(--primary-dark); }
+.cd-prose blockquote {
+  border-left: 3px solid var(--primary);
+  margin: 1em 0;
+  padding: .5em 1em;
+  background: var(--bg-surface);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.cd-prose pre, .cd-prose code {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: .85em;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+}
+.cd-prose code { padding: 2px 6px; }
+.cd-prose pre {
+  padding: 1em;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+.cd-prose pre code { padding: 0; background: none; }
+.cd-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+.cd-prose th, .cd-prose td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+.cd-prose th { background: var(--bg-surface); font-weight: 600; color: var(--text-primary); }
+.cd-prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+
+/* Curriculum */
+.cd-section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-lg);
+}
+.cd-empty {
+  text-align: center;
+  padding: var(--sp-2xl);
+  color: var(--text-muted);
+}
+.cd-empty-icon { font-size: 3rem; display: block; margin-bottom: var(--sp-sm); }
+
+/* Accordion */
+.cd-accordion { display: flex; flex-direction: column; gap: var(--sp-sm); }
+.cd-unit {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+.cd-unit-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-md) var(--sp-lg);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--dur-fast);
+  gap: var(--sp-md);
+}
+.cd-unit-header:hover { background: var(--bg-surface); }
+.cd-unit-header.open { background: rgba(99,102,241,.05); border-bottom: 1px solid var(--border); }
+.cd-unit-left { display: flex; align-items: center; gap: var(--sp-md); flex: 1; min-width: 0; }
+.cd-unit-index {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: #fff;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  font-weight: 700;
+}
+.cd-unit-name {
+  display: block;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cd-unit-count { display: block; font-size: .75rem; color: var(--text-muted); margin-top: 2px; }
+.cd-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform var(--dur-mid) var(--ease);
+}
+.cd-unit-header.open .cd-chevron { transform: rotate(180deg); }
+
+.cd-unit-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--dur-slow) var(--ease);
+}
+.cd-unit-body.open { max-height: 2000px; }
+
+.cd-lesson-empty { padding: var(--sp-md) var(--sp-lg); font-size: .85rem; color: var(--text-muted); font-style: italic; }
+.cd-lesson-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: 10px var(--sp-lg);
+  border-top: 1px solid var(--border);
+  transition: background var(--dur-fast);
+}
+.cd-lesson-row:hover { background: var(--bg-surface); }
+.cd-lesson-row--locked { opacity: .6; }
+.cd-lesson-icon {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+.cd-lesson-row--locked .cd-lesson-icon { color: var(--locked); }
+.cd-lesson-info { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--sp-sm); }
+.cd-lesson-num { font-size: .75rem; color: var(--text-muted); flex-shrink: 0; }
+.cd-lesson-name { font-size: .875rem; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cd-lesson-tags { display: flex; gap: 5px; flex-shrink: 0; }
+.cd-tag {
+  font-size: .7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.cd-tag--mode { background: rgba(99,102,241,.1); color: var(--primary); }
+.cd-tag--locked { background: rgba(100,116,139,.12); color: var(--locked); }
+.cd-tag--score { background: rgba(217,119,6,.12); color: var(--warning); }
+
+/* Sidebar enroll card */
+.cd-sidebar { position: sticky; top: calc(var(--nav-h) + var(--sp-lg)); }
+.cd-enroll-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.cd-enroll-thumb {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+div.cd-enroll-thumb {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cd-enroll-gradient { position: relative; }
+.cd-enroll-gradient[data-hash="0"] { background: linear-gradient(135deg,#6366f1,#8b5cf6); }
+.cd-enroll-gradient[data-hash="1"] { background: linear-gradient(135deg,#0891b2,#06b6d4); }
+.cd-enroll-gradient[data-hash="2"] { background: linear-gradient(135deg,#7c3aed,#a78bfa); }
+.cd-enroll-gradient[data-hash="3"] { background: linear-gradient(135deg,#0f766e,#14b8a6); }
+.cd-enroll-gradient[data-hash="4"] { background: linear-gradient(135deg,#b45309,#f59e0b); }
+.cd-enroll-gradient[data-hash="5"] { background: linear-gradient(135deg,#be185d,#f472b6); }
+.cd-enroll-gradient-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+  padding: var(--sp-md);
+  text-shadow: 0 1px 6px rgba(0,0,0,.3);
+}
+.cd-enroll-body { padding: var(--sp-lg); }
+.btn-enroll { width: 100%; justify-content: center; margin-bottom: var(--sp-sm); }
+.btn-enroll-ghost { width: 100%; justify-content: center; }
+.cd-features {
+  list-style: none;
+  margin-top: var(--sp-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: var(--sp-lg);
+  border-top: 1px solid var(--border);
+}
+.cd-features li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  font-size: .875rem;
+  color: var(--text-secondary);
+}
+.cd-features li svg { color: var(--success); flex-shrink: 0; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .cd-container { grid-template-columns: 1fr; }
+  .cd-sidebar { position: static; }
+  .cd-hero { min-height: 320px; }
+}
+@media (max-width: 600px) {
+  .cd-stats-bar { flex-wrap: wrap; justify-content: center; gap: var(--sp-md); }
+  .cd-meta-row { gap: var(--sp-md); }
+  .cd-lesson-tags { display: none; }
+  .rv-overview { flex-direction: column; }
+}
+
+/* ===== REVIEWS SECTION ===== */
+.cd-reviews {
+  margin-top: var(--sp-xl);
+}
+
+/* Rating overview */
+.rv-overview {
+  display: flex;
+  gap: var(--sp-xl);
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-xl);
+  margin-bottom: var(--sp-lg);
+  box-shadow: var(--shadow-sm);
+}
+.rv-score-box {
+  text-align: center;
+  flex-shrink: 0;
+  min-width: 110px;
+}
+.rv-big-score {
+  display: block;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.rv-stars-row { display: flex; justify-content: center; gap: 2px; margin-bottom: 4px; }
+.rv-star { color: var(--text-muted); }
+.rv-star--filled { fill: #f59e0b; stroke: #f59e0b; color: #f59e0b; }
+.rv-total { font-size: .8rem; color: var(--text-muted); }
+
+.rv-bars { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.rv-bar-row { display: flex; align-items: center; gap: var(--sp-sm); }
+.rv-bar-label { font-size: .78rem; font-weight: 600; color: var(--text-secondary); width: 42px; text-align: right; flex-shrink: 0; }
+.rv-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.rv-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: var(--radius-full);
+  transition: width var(--dur-slow) var(--ease);
+}
+.rv-bar-count { font-size: .75rem; color: var(--text-muted); width: 20px; flex-shrink: 0; }
+
+/* Review form */
+.rv-form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-lg);
+  margin-bottom: var(--sp-lg);
+  box-shadow: var(--shadow-sm);
+}
+.rv-form-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--sp-md);
+}
+.rv-form { display: flex; flex-direction: column; gap: var(--sp-md); }
+.rv-star-select { display: flex; align-items: center; gap: var(--sp-md); }
+.rv-star-label { font-size: .875rem; font-weight: 600; color: var(--text-secondary); }
+.rv-star-group { display: flex; gap: 4px; }
+.rv-star-btn {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: transform var(--dur-fast), color var(--dur-fast);
+  border-radius: var(--radius-sm);
+}
+.rv-star-btn:hover { transform: scale(1.15); }
+.rv-star-btn.active svg { fill: #f59e0b; stroke: #f59e0b; color: #f59e0b; }
+.rv-star-btn.hover svg { fill: #fbbf24; stroke: #fbbf24; color: #fbbf24; }
+
+.rv-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: .875rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color var(--dur-fast);
+}
+.rv-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.rv-textarea::placeholder { color: var(--text-muted); }
+
+.rv-submit-btn {
+  align-self: flex-start;
+}
+.rv-submit-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.rv-already, .rv-login-prompt {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  font-size: .875rem;
+  color: var(--text-secondary);
+}
+.rv-login-prompt { justify-content: center; }
+
+/* Reviews list */
+.rv-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-md);
+}
+.rv-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-lg);
+  transition: border-color var(--dur-fast);
+}
+.rv-item:hover { border-color: var(--border-hover); }
+.rv-item-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  margin-bottom: var(--sp-sm);
+}
+.rv-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.rv-avatar--initial {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rv-item-info { flex: 1; min-width: 0; }
+.rv-username { display: block; font-size: .875rem; font-weight: 600; color: var(--text-primary); }
+.rv-date { display: block; font-size: .72rem; color: var(--text-muted); }
+.rv-item-stars { display: flex; gap: 1px; flex-shrink: 0; }
+.rv-star-sm { color: var(--text-muted); }
+.rv-content {
+  font-size: .875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-top: var(--sp-xs);
+}
+
+.rv-empty {
+  text-align: center;
+  padding: var(--sp-xl);
+  color: var(--text-muted);
+}
+.rv-empty-icon { font-size: 2.5rem; display: block; margin-bottom: var(--sp-sm); }
+</style>
+
+<script>
+// Accordion toggle
+document.querySelectorAll('.cd-unit-header').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const bodyId = btn.dataset.unit;
+    const body = document.getElementById(bodyId);
+    const isOpen = btn.classList.contains('open');
+    btn.classList.toggle('open', !isOpen);
+    btn.setAttribute('aria-expanded', String(!isOpen));
+    body.classList.toggle('open', !isOpen);
+  });
+});
+
+// Star rating picker
+(function() {
+  const group = document.getElementById('rv-star-select');
+  if (!group) return;
+
+  const btns = group.querySelectorAll('.rv-star-btn');
+  const input = document.getElementById('rv-rating-input');
+  const submit = document.getElementById('rv-submit-btn');
+  let selected = 0;
+
+  btns.forEach(btn => {
+    const val = parseInt(btn.dataset.value, 10);
+
+    btn.addEventListener('click', () => {
+      selected = val;
+      input.value = val;
+      submit.disabled = false;
+      btns.forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.value, 10) <= val);
+      });
+    });
+
+    btn.addEventListener('mouseenter', () => {
+      btns.forEach(b => {
+        const v = parseInt(b.dataset.value, 10);
+        b.classList.toggle('hover', v <= val && v > selected);
+      });
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btns.forEach(b => b.classList.remove('hover'));
+    });
+  });
+})();
+</script>

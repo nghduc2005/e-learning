@@ -129,5 +129,92 @@ export const courseService = {
       throw error;
     }
   },
-  
+
+  getPublicCourses: async () => {
+    try {
+      const rows = await courseModel.findPublic();
+      return rows.map(row => ({
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        banner: row.banner,
+        status: row.status,
+        studentCount: row.studentCount || 0,
+        avgRating: row.avgRating ? Number(row.avgRating) : null,
+        reviewCount: row.reviewCount || 0,
+        createdAt: row.createdAt,
+      }));
+    } catch (error) {
+      console.error('Lỗi lấy danh sách khóa học công khai:', error.message);
+      throw error;
+    }
+  },
+
+  getCourseDetail: async (id) => {
+    try {
+      const course = await courseModel.findCourseDetail(id);
+      if (!course) return null;
+      return {
+        id: course.id,
+        name: course.name,
+        description: course.description,
+        shortDescription: course.description
+          ? course.description.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().substring(0, 200)
+          : '',
+        banner: course.banner,
+        status: course.status,
+        studentCount: course.studentCount || 0,
+        avgRating: course.avgRating ? Number(course.avgRating) : null,
+        reviewCount: course.reviewCount || 0,
+        createdAt: course.createdAt,
+        units: (course.units || []).map(u => ({
+          id: u.id,
+          name: u.name,
+          status: u.status,
+          lessons: (u.lessons || []).map(l => ({
+            id: l.id,
+            name: l.name,
+            learnMode: l.learnMode,
+            status: l.status,
+            passScore: l.passScore,
+          })),
+        })),
+      };
+    } catch (error) {
+      console.error('Lỗi lấy chi tiết khóa học:', error.message);
+      throw error;
+    }
+  },
+  enrollUserToCourse: async (userId, courseId) => {
+    try {
+      const existing = await courseModel.findUserCourse(userId, courseId);
+      if (existing) {
+        throw new Error('Bạn đã tham gia khóa học này rồi');
+      }
+
+      await courseModel.enrollUser(userId, courseId);
+    } catch (error) {
+      console.error('Lỗi tham gia khóa học:', error.message);
+      throw error;
+    }
+  },
+  getEnrollUser: async (userId, courseId) => {
+    try {
+      const result = await courseModel.findUserCourse(userId, courseId);
+      return result;
+    } catch (error) {
+      console.error("Error in service: ", error);
+      throw error;
+    }
+  },
+  getFirstUncompletedLessonId: async (userId, courseId) => {
+    try {
+      const result = await courseModel.findFirstUncompletedLesson(userId, courseId);
+      const defaultLeson = await lessonModel.findFirstByCourseId(courseId);
+      return result ? result.lessonId : (defaultLeson ? defaultLeson.id : null);
+    } catch (error) {
+      console.error("Error in service: ", error);
+      throw error;
+    }
+  }
 };
