@@ -5,12 +5,14 @@ const LIST_PAGES = [
   '/unit/list',
   '/lesson/list',
   '/trash',
+  '/comments',
 ];
 
 const BACK_URL_MAP = {
   course:  '/admin/course/list',
   unit:    '/admin/unit/list',
   lesson:  '/admin/lesson/list',
+  comments: '/admin/comments',
 };
 
 module.exports = function backButtonMiddleware(req, res, next) {

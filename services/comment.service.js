@@ -102,7 +102,48 @@ const commentService = {
   restoreComment: async (commentId) => commentModel.restore(commentId),
   hardDeleteComment: async (commentId) => commentModel.hardDelete(commentId),
   acceptReport: async (reportId) => commentModel.acceptReport(reportId),
+  acceptReportAndHardDelete: async (reportId) => commentModel.acceptReportAndHardDelete(reportId),
   rejectReport: async (reportId) => commentModel.rejectReport(reportId),
+
+  getAllCommentsForAdmin: async () => {
+    const rows = await commentModel.findAllForAdmin();
+    return rows.map((r) => ({
+      id: r.id,
+      content: r.content,
+      isDeleted: !!r.isDeleted,
+      isReply: !!r.parentId,
+      parentId: r.parentId,
+      createdAt: formatDate(r.createdAt),
+      userId: r.userId,
+      username: r.username,
+      avatar: r.avatar || null,
+      lessonId: r.lessonId,
+      lessonName: r.lessonName,
+      courseId: r.courseId,
+      courseName: r.courseName,
+      pendingReportsCount: Number(r.pendingReportsCount) || 0,
+    }));
+  },
+
+  getPendingReportsGlobal: async () => {
+    const rows = await commentModel.findAllPendingReportsGlobal();
+    return rows.map((r) => ({
+      reportId: r.reportId,
+      reason: r.reason,
+      reportStatus: r.reportStatus,
+      reportedAt: formatDate(r.reportedAt),
+      reporterId: r.reporterId,
+      reporterName: r.reporterName,
+      reporterAvatar: r.reporterAvatar || null,
+      commentId: r.commentId,
+      commentContent: r.commentContent,
+      commentDeleted: !!r.commentDeleted,
+      commentAuthor: r.commentAuthor,
+      lessonName: r.lessonName,
+      courseId: r.courseId,
+      courseName: r.courseName,
+    }));
+  },
 };
 
 export default commentService;

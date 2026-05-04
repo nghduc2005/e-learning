@@ -233,6 +233,16 @@ export const lessonController = {
     }
   },
 
+  acceptReportHardDelete: async (req, res) => {
+    try {
+      await commentService.acceptReportAndHardDelete(req.params.reportId);
+      await logAction(req.session.admin?.id, 'delete_comment', `Chấp nhận báo cáo #${req.params.reportId} – xóa vĩnh viễn bình luận`);
+      res.json({ ok: 1 });
+    } catch (error) {
+      res.status(500).json({ error: "Không thể xóa bình luận" });
+    }
+  },
+
   rejectReport: async (req, res) => {
     try {
       await commentService.rejectReport(req.params.reportId);

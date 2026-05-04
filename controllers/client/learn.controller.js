@@ -1,3 +1,5 @@
+const learnInteraction = require('../../services/learnInteraction.service');
+
 const learnController = {
   lessonPage: async (req, res) => {
     try {
@@ -62,25 +64,8 @@ const learnController = {
         ? await progressModel.getBestAttempt(user.id, lessonId)
         : null;
 
-      // Lấy bình luận và xây dựng cấu trúc cha-con
       const flatComments = await commentModel.findByLessonId(lessonId);
-      const commentMap = {};
-      const commentTree = [];
-
-      flatComments.forEach(comment => {
-        comment.replies = [];
-        commentMap[comment.id] = comment;
-      });
-
-      flatComments.forEach(comment => {
-        if (comment.parentId) {
-          if (commentMap[comment.parentId]) {
-            commentMap[comment.parentId].replies.push(comment);
-          }
-        } else {
-          commentTree.push(comment);
-        }
-      });
+      const commentTree = learnInteraction.buildCommentTree(flatComments);
 
       res.render('client/course/learn', {
         title: `${lesson.name} – E-learn`,
@@ -94,6 +79,7 @@ const learnController = {
         prevLesson,
         nextLesson,
         user,
+        commentMaxLength: learnInteraction.COMMENT_MAX_LENGTH,
       });
     } catch (error) {
       console.error('Lỗi trang học:', error.message);
@@ -118,18 +104,19 @@ const learnController = {
       const user = res.locals.user;
       if (!user) return res.status(401).json({ success: false });
       const { progressModel } = await import('../../models/progress.model.js');
-      const { watchPercent, lastPositionSec } = req.body;
-      if (watchPercent === undefined || isNaN(watchPercent)) {
-            return res.status(400).json({ success: false, message: 'Dữ liệu tiến độ không hợp lệ' });
-        }
-
-        // 2. Ép kiểu về số thực và giới hạn từ 0 - 100 để an toàn tuyệt đối
-        watchPercent = Number(watchPercent);
-        if (watchPercent < 0) watchPercent = 0;
-        if (watchPercent > 100) watchPercent = 100;
-      await progressModel.upsertProgress(user.id, parseInt(req.params.lessonId), {
-        watchPercent: Math.min(100, Math.max(0, parseInt(watchPercent) || 0)),
-        lastPositionSec: Math.max(0, parseInt(lastPositionSec) || 0),
+      const raw = req.body?.watchPercent;
+      if (raw === undefined || raw === null || Number.isNaN(Number(raw))) {
+        return res.status(400).json({ success: false, message: 'Dữ liệu tiến độ không hợp lệ' });
+      }
+      let pct = Number(raw);
+      if (!Number.isFinite(pct)) {
+        return res.status(400).json({ success: false, message: 'Dữ liệu tiến độ không hợp lệ' });
+      }
+      pct = Math.min(100, Math.max(0, Math.round(pct)));
+      const lastSec = Math.max(0, parseInt(req.body?.lastPositionSec, 10) || 0);
+      await progressModel.upsertProgress(user.id, parseInt(req.params.lessonId, 10), {
+        watchPercent: pct,
+        lastPositionSec: lastSec,
       });
       return res.json({ success: true });
     } catch (error) {
@@ -221,17 +208,40 @@ const learnController = {
       const { courseId, lessonId } = req.params;
       const { content, parentId } = req.body;
 
-      // Xử lý báo lỗi 400 nếu bình luận trống
-      if (!content?.trim()) {
+      const validated = learnInteraction.validateCommentContent(content);
+      if (!validated.ok) {
         if (req.headers.accept && req.headers.accept.includes('application/json')) {
-          return res.status(400).json({ success: false, message: 'Nội dung bình luận không được để trống' });
+          return res.status(400).json({ success: false, message: validated.error });
         }
         return res.redirect(`/learn/${courseId}/${lessonId}#tab-comments`);
       }
 
-      // 2. Lưu vào DB (Đã parse parentId cẩn thận)
-      const parsedParentId = parentId ? parseInt(parentId) : null;
-      const commentId = await commentModel.create(user.id, parseInt(lessonId), content.trim(), parsedParentId);
+      const parsedParentId = parentId ? parseInt(parentId, 10) : null;
+      const lessonIdNum = parseInt(lessonId, 10);
+
+      if (parsedParentId) {
+        const parent = await commentModel.findById(parsedParentId);
+        const badParent =
+          !parent ||
+          Number(parent.isDeleted) === 1 ||
+          Number(parent.lessonId) !== lessonIdNum;
+        if (badParent) {
+          if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.status(400).json({
+              success: false,
+              message: 'Bình luận gốc không còn tồn tại hoặc không thuộc bài học này.',
+            });
+          }
+          return res.redirect(`/learn/${courseId}/${lessonId}#tab-comments`);
+        }
+      }
+
+      const commentId = await commentModel.create(
+        user.id,
+        lessonIdNum,
+        validated.trimmed,
+        parsedParentId
+      );
       const newComment = await commentModel.findById(commentId);
 
       // 3. Trả về JSON cho Frontend

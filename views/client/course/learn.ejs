@@ -2,14 +2,26 @@
 
 <div class="learn-wrap">
 
-  <!-- ========== MAIN COLUMN ========== -->
-  <main class="learn-main"> <!-- Sửa div thành thẻ main mang tính semantic hơn -->
+  <div class="learn-module-bar" role="region" aria-label="Module học tập và tương tác">
+    <div class="learn-module-bar-inner">
+      <span class="learn-module-badge">Học tập</span>
+      <span class="learn-module-title"><%= course.name %></span>
+      <span class="learn-module-sep" aria-hidden="true">·</span>
+      <span class="learn-module-badge learn-module-badge--muted">Tương tác</span>
+      <span class="learn-module-sub">Thảo luận dưới bài · Báo cáo vi phạm · Tiến độ &amp; kiểm tra</span>
+    </div>
+  </div>
+
+  <div class="learn-body">
+
+  
+  <main class="learn-main"> 
 
     <!-- Lesson header -->
     <header class="lesson-header">
       <div class="lesson-header-info">
         <div class="lesson-breadcrumb"><%= course.name %></div>
-        <h1 class="lesson-title" style="margin:0;"><%= lesson.name %></h1> <!-- Đổi thành h1 thay vì div -->
+        <h1 class="lesson-title" style="margin:0;"><%= lesson.name %></h1> 
       </div>
       <button
         id="complete-btn"
@@ -23,16 +35,20 @@
       </button>
     </header>
 
-    <!-- Video player (only for video mode) -->
+  
     <% if (lesson.learnMode === 'video') { %>
       <div class="learn-player">
         <div class="video-wrapper">
-          <!-- Đổi Iframe thành thẻ Video -->
+          <div class="video-loading" id="video-loading" aria-live="polite">
+            <span class="video-loading-spinner" aria-hidden="true"></span>
+            <span>Đang tải video…</span>
+          </div>
           <video 
             id="lesson-video" 
             controls 
             style="width: 100%; height: 100%; background: #000;"
             src="<%= lesson.content %>"
+            preload="metadata"
           >
             Trình duyệt của bạn không hỗ trợ xem video.
           </video>
@@ -40,7 +56,7 @@
       </div>
     <% } %>
 
-    <!-- Tab bar (Đã bổ sung a11y) -->
+
     <nav class="learn-tab-bar" id="tab-bar" role="tablist" aria-label="Các mục nội dung bài học">
       <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="pane-overview" data-tab="overview">
         Tổng quan
@@ -56,7 +72,7 @@
         </button>
       <% } %>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="pane-comments" data-tab="comments">
-        Thảo luận
+        Thảo luận<% if (typeof comments !== 'undefined' && comments.length) { %>&nbsp;<span class="tab-count">(<%= comments.length %>)</span><% } %>
       </button>
     </nav>
 
@@ -67,8 +83,8 @@
       <div class="tab-pane active" id="pane-overview" role="tabpanel">
         <% if (lesson.learnMode === 'article') { %>
           <article class="article-reader">
-            <h2><%= lesson.name %></h2> <!-- Sửa h1 thành h2 vì h1 đã dùng ở header -->
-            <!-- LƯU Ý BẢO MẬT: Đảm bảo biến lesson.content đã được sanitize (vd: dùng thư viện xss-clean hoặc DOMPurify) từ backend trước khi render -->
+            <h2><%= lesson.name %></h2> 
+            
             <%- lesson.content %>
           </article>
         <% } else { %>
@@ -195,9 +211,13 @@
                 <textarea 
                   id="comment-textarea"
                   name="content" 
-                  placeholder="Thêm bình luận của bạn..." 
+                  placeholder="Bình luận" 
                   rows="1"
+                  maxlength="<%= typeof commentMaxLength !== 'undefined' ? commentMaxLength : 500 %>"
                 ></textarea>
+                <div class="comment-char-row">
+                  <span id="comment-char-count" class="comment-char-count">0 / <%= typeof commentMaxLength !== 'undefined' ? commentMaxLength : 500 %></span>
+                </div>
                 
                 <!-- Nhóm nút bấm hành động -->
                 <div class="comment-form-actions">
@@ -251,7 +271,7 @@
             
             <!-- KIỂM TRA QUYỀN SỞ HỮU ĐỂ HIỆN NÚT XÓA -->
             <% if (user.username === cmt.username) { %>
-              <button class="c-action-btn" style="color: #ef4444;" onclick="deleteComment('<%= cmt.id %>')">Xóa</button>
+              <button type="button" class="c-action-btn" style="color: #ef4444;" data-delete-comment="<%= cmt.id %>">Xóa</button>
             <% } %>
 
             <button class="c-action-btn" onclick="openReport('<%= cmt.id %>')">Báo cáo</button>
@@ -263,7 +283,7 @@
           <div class="reply-form-area" id="reply-<%= cmt.id %>" style="display:none; margin-top: 10px;">
             <form action="/learn/<%= course.id %>/<%= lesson.id %>/comments" method="POST" onsubmit="submitReply(event, '<%= cmt.id %>')">
               <input type="hidden" name="parentId" value="<%= cmt.id %>">
-              <textarea name="content" placeholder="Phản hồi đến <%= cmt.username %>..." rows="2" style="width: 100%; padding: 8px; border-radius: 6px;"></textarea>
+              <textarea name="content" placeholder="Phản hồi đến <%= cmt.username %>..." rows="2" style="width: 100%; padding: 8px; border-radius: 6px;" maxlength="<%= typeof commentMaxLength !== 'undefined' ? commentMaxLength : 500 %>"></textarea>
               <div style="margin-top: 8px; text-align: right;">
                 <button type="submit" class="reply-post-btn">Gửi câu trả lời</button>
               </div>
@@ -393,7 +413,21 @@
     </div>
   </aside>
 
+  </div><!-- /learn-body -->
+
 </div><!-- /learn-wrap -->
+
+<!-- Xác nhận xoá bình luận (UC-3.8) -->
+<div class="delete-comment-overlay" id="delete-comment-overlay" style="display:none;" aria-hidden="true">
+  <div class="delete-comment-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <h3 id="delete-modal-title">Xoá bình luận?</h3>
+    <p class="delete-comment-text">Bạn có chắc chắn muốn xóa bình luận này?</p>
+    <div class="delete-comment-actions">
+      <button type="button" class="report-cancel-btn" id="delete-modal-cancel">Huỷ</button>
+      <button type="button" class="delete-confirm-btn" id="delete-modal-confirm">Xoá</button>
+    </div>
+  </div>
+</div>
 
 <!-- Report modal -->
 <div class="report-overlay" id="report-overlay" style="display:none;">
@@ -416,7 +450,9 @@
     lessonId: (typeof lesson !== 'undefined' && lesson) ? lesson.id : null,
     learnMode: (typeof lesson !== 'undefined' && lesson) ? lesson.learnMode : "",
     isCompleted: (typeof lessonProgress !== 'undefined' && lessonProgress && lessonProgress.isCompleted) ? true : false,
-    watchPercent: (typeof lessonProgress !== 'undefined' && lessonProgress) ? lessonProgress.watchPercent : 0
+    watchPercent: (typeof lessonProgress !== 'undefined' && lessonProgress) ? lessonProgress.watchPercent : 0,
+    commentMaxLength: typeof commentMaxLength !== 'undefined' ? commentMaxLength : 500,
+    currentUsername: (typeof user !== 'undefined' && user) ? (user.username || '') : ''
   }) %>
 </script>
 

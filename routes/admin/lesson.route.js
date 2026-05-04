@@ -35,6 +35,7 @@ router.post('/comment/:commentId/hide', lessonController.hideComment)
 router.post('/comment/:commentId/restore', lessonController.restoreComment)
 router.post('/comment/:commentId/delete', lessonController.hardDeleteComment)
 router.post('/report/:reportId/accept', lessonController.acceptReport)
+router.post('/report/:reportId/accept-delete', lessonController.acceptReportHardDelete)
 router.post('/report/:reportId/reject', lessonController.rejectReport)
 
 module.exports = router

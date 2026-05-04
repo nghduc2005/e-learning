@@ -21,12 +21,6 @@
                 Bài học
             </a>
         </li>
-        <li class="mr-2">
-            <a href="?tab=comment" class="inline-flex items-center p-4 <%= tab === 'comment' ? 'text-indigo-600 border-b-2 border-indigo-600 rounded-t-lg active group' : 'border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300 group' %>" <%= tab === 'comment' ? 'aria-current="page"' : '' %>>
-                <svg class="w-4 h-4 mr-2 <%= tab === 'comment' ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                Bình luận
-            </a>
-        </li>
     </ul>
 </div>
 
@@ -45,78 +39,4 @@
   lessonList,
   isTrash: true
 })%>
-<% } else if (tab === 'comment') { %>
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-  <% if (!commentList || commentList.length === 0) { %>
-    <div class="flex flex-col items-center justify-center py-16">
-      <svg class="w-12 h-12 text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-      </svg>
-      <p class="text-sm text-gray-400 italic">Không có bình luận nào trong thùng rác.</p>
-    </div>
-  <% } else { %>
-  <table class="w-full text-sm text-left">
-    <thead class="bg-gray-50 border-b border-gray-100">
-      <tr>
-        <th class="px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Tác giả</th>
-        <th class="px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Nội dung</th>
-        <th class="px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Khóa học / Bài học</th>
-        <th class="px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">Ngày tạo</th>
-        <th class="px-5 py-3 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Thao tác</th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-50">
-      <% commentList.forEach(function(c) { %>
-      <tr class="hover:bg-gray-50/50 transition-colors">
-        <td class="px-5 py-4">
-          <div class="flex items-center gap-3">
-            <% if (c.avatar) { %>
-              <img src="<%= c.avatar %>" alt="" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
-            <% } else { %>
-              <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                <span class="text-xs font-bold text-indigo-600"><%= c.username ? c.username.charAt(0).toUpperCase() : '?' %></span>
-              </div>
-            <% } %>
-            <span class="font-medium text-gray-700 text-sm"><%= c.username %></span>
-          </div>
-        </td>
-        <td class="px-5 py-4 max-w-xs">
-          <% if (c.isReply) { %>
-            <span class="inline-block mb-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-600 bg-violet-50 rounded-full">Trả lời</span>
-          <% } %>
-          <p class="text-gray-700 line-clamp-2"><%= c.content %></p>
-        </td>
-        <td class="px-5 py-4">
-          <p class="font-medium text-gray-700 text-xs"><%= c.courseName %></p>
-          <p class="text-gray-400 text-xs mt-0.5"><%= c.lessonName %></p>
-        </td>
-        <td class="px-5 py-4 text-gray-500 whitespace-nowrap"><%= c.createdAt %></td>
-        <td class="px-5 py-4">
-          <div class="flex items-center justify-end gap-2">
-            <form action="/admin/trash/comment/<%= c.id %>/restore" method="POST" class="inline"
-                  onsubmit="return confirm('Khôi phục bình luận này?');">
-              <button type="submit" title="Khôi phục"
-                      class="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-green-400 text-green-500 hover:bg-green-500 hover:text-white transition-all shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
-              </button>
-            </form>
-            <form action="/admin/trash/comment/<%= c.id %>/delete" method="POST" class="inline"
-                  onsubmit="return confirm('Xóa vĩnh viễn bình luận này? Hành động không thể hoàn tác.');">
-              <button type="submit" title="Xóa vĩnh viễn"
-                      class="w-9 h-9 flex items-center justify-center rounded-xl bg-white border border-red-400 text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-              </button>
-            </form>
-          </div>
-        </td>
-      </tr>
-      <% }) %>
-    </tbody>
-  </table>
-  <% } %>
-</div>
 <% } %>

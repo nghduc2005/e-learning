@@ -7,10 +7,186 @@ main  { flex: 1; padding: 0 !important; }
 /* ===== Outer wrapper ===== */
 .learn-wrap {
   display: flex;
-  align-items: flex-start; /* Quan trọng: Không cho sidebar bị kéo giãn bằng chiều cao toàn trang */
+  flex-direction: column;
+  align-items: stretch;
   width: 100%;
-  max-width: 1600px; /* Tùy chọn: Giới hạn chiều rộng tổng thể cho màn hình siêu lớn */
+  max-width: 1600px;
   margin: 0 auto;
+}
+
+.learn-body {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Module: Học tập & Tương tác */
+.learn-module-bar {
+  flex-shrink: 0;
+  width: 100%;
+  background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+  border-bottom: 1px solid #334155;
+  padding: 8px 24px;
+}
+.learn-module-bar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.learn-module-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #6366f1;
+  color: #fff;
+}
+.learn-module-badge--muted {
+  background: #334155;
+  color: #e2e8f0;
+}
+.learn-module-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.learn-module-sep { color: #475569; font-weight: 300; }
+.learn-module-sub {
+  font-size: 12px;
+  color: #64748b;
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+@media (max-width: 640px) {
+  .learn-body {
+    flex-direction: column;
+  }
+  .learn-sidebar {
+    width: 100% !important;
+    border-left: none;
+    border-top: 1px solid #334155;
+    position: relative;
+    height: auto;
+    max-height: 50vh;
+  }
+}
+
+.tab-count {
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.discussion-hint {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  background: #1e293b;
+  border-radius: 8px;
+  border-left: 3px solid #6366f1;
+}
+
+.comment-char-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.comment-char-count {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.video-wrapper { position: relative; }
+.video-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: opacity 0.25s ease;
+}
+.video-loading.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.video-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #334155;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: learn-spin 0.7s linear infinite;
+}
+@keyframes learn-spin {
+  to { transform: rotate(360deg); }
+}
+
+.delete-comment-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.delete-comment-modal {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 22px;
+  max-width: 400px;
+  width: 100%;
+  color: #e2e8f0;
+}
+.delete-comment-modal h3 {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+}
+.delete-comment-text {
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #94a3b8;
+}
+.delete-comment-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.delete-confirm-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #dc2626;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+.delete-confirm-btn:hover {
+  background: #b91c1c;
 }
 
 /* ===== Main column ===== */

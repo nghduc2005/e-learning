@@ -3,6 +3,7 @@
    ===================================================== */
 
 const CFG = window.LEARN_CONFIG || {};
+const COMMENT_MAX = CFG.commentMaxLength || 500;
 
 // ─── Helpers ────────────────────────────────────────
 
@@ -242,7 +243,7 @@ async function submitReport() {
 
   closeReport();
   if (data.success) {
-    showToast('Đã gửi báo cáo. Cảm ơn bạn!', 'success');
+    showToast('Báo cáo thành công. Cảm ơn bạn!', 'success');
   } else {
     showToast(data.message || 'Có lỗi xảy ra.', 'error');
   }
@@ -260,23 +261,38 @@ document.addEventListener('click', e => {
 
 if (CFG.learnMode === 'video') {
   const video = document.getElementById('lesson-video');
-  
+  const loadingEl = document.getElementById('video-loading');
+
   if (video) {
-    // Lấy tiến độ cũ từ backend nếu có để không bắt đầu lại từ 0
-    let lastSentPercent = window.LEARN_CONFIG && window.LEARN_CONFIG.isCompleted 
-        ? 100 
-        : (window.LEARN_CONFIG ? window.LEARN_CONFIG.watchPercent || 0 : 0);
+    if (loadingEl) {
+      video.addEventListener('loadstart', () => loadingEl.classList.remove('is-hidden'));
+      video.addEventListener('canplay', () => loadingEl.classList.add('is-hidden'));
+      video.addEventListener('error', () => {
+        loadingEl.classList.remove('is-hidden');
+        loadingEl.innerHTML = '<span>Không tải được video. Vui lòng thử lại sau.</span>';
+      });
+    }
+
+    let lastSentPercent = window.LEARN_CONFIG && window.LEARN_CONFIG.isCompleted
+      ? 100
+      : (window.LEARN_CONFIG ? window.LEARN_CONFIG.watchPercent || 0 : 0);
 
     function sendProgress(percent) {
       if (percent <= lastSentPercent) return;
       lastSentPercent = percent;
-      
-      navigator.sendBeacon
-        ? navigator.sendBeacon(`/learn/${CFG.courseId}/${CFG.lessonId}/progress`,
-            new Blob([JSON.stringify({ watchPercent: percent })],
-              { type: 'application/json' }))
-        : apiFetch(`/learn/${CFG.courseId}/${CFG.lessonId}/progress`,
-            { watchPercent: percent });
+      const lastPositionSec = Math.max(0, Math.floor(video.currentTime || 0));
+      const payload = JSON.stringify({ watchPercent: percent, lastPositionSec });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(
+          `/learn/${CFG.courseId}/${CFG.lessonId}/progress`,
+          new Blob([payload], { type: 'application/json' })
+        );
+      } else {
+        apiFetch(`/learn/${CFG.courseId}/${CFG.lessonId}/progress`, {
+          watchPercent: percent,
+          lastPositionSec,
+        });
+      }
     }
 
     // Sự kiện 'timeupdate' tự động chạy liên tục khi video đang phát
@@ -323,7 +339,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const content = textarea.value.trim();
       const url = commentForm.getAttribute('action');
 
-      if (!content) return alert('Vui lòng nhập nội dung bình luận!');
+      if (!content) {
+        showToast('Bình luận không được để trống', 'error');
+        return;
+      }
+      if (content.length > COMMENT_MAX) {
+        showToast(`Nội dung không quá ${COMMENT_MAX} ký tự`, 'error');
+        return;
+      }
 
       try {
         // Gửi dữ liệu lên server bằng Fetch API
@@ -367,9 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
       ? `<img src="${c.avatar}" alt="" class="c-avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
          <div class="c-avatar-init" style="display:none">${c.username.charAt(0).toUpperCase()}</div>`
       : `<div class="c-avatar-init">${c.username.charAt(0).toUpperCase()}</div>`;
+    const own = CFG.currentUsername && c.username === CFG.currentUsername;
+    const delBtn = own
+      ? `<button type="button" class="c-action-btn" style="color: #ef4444;" data-delete-comment="${c.id}">Xóa</button>`
+      : '';
 
     return `
-      <div class="comment-item" id="cmt-${c.id}">
+      <div class="comment-item parent-comment" id="cmt-${c.id}">
         <div class="comment-meta">
           ${avatarHTML}
           <span class="c-username">${c.username}</span>
@@ -377,14 +404,14 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <p class="c-content">${c.content}</p>
         <div class="c-actions">
-          <button class="c-action-btn" onclick="toggleReply(${c.id})">Trả lời</button>
-          <button class="c-action-btn" onclick="openReport(${c.id})">Báo cáo</button>
+          <button type="button" class="c-action-btn" onclick="toggleReply(${c.id})">Trả lời</button>
+          ${delBtn}
+          <button type="button" class="c-action-btn" onclick="openReport(${c.id})">Báo cáo</button>
         </div>
-        <!-- Vùng chứa form trả lời (ẩn mặc định) -->
-        <div class="reply-form-area" id="reply-${c.id}">
+        <div class="reply-form-area" id="reply-${c.id}" style="display:none;">
             <form action="/learn/${window.LEARN_CONFIG.courseId}/${window.LEARN_CONFIG.lessonId}/comments" method="POST" onsubmit="submitReply(event, ${c.id})">
               <input type="hidden" name="parentId" value="${c.id}">
-              <textarea name="content" placeholder="Viết câu trả lời..." rows="2"></textarea>
+              <textarea name="content" placeholder="Viết câu trả lời..." rows="2" maxlength="${COMMENT_MAX}"></textarea>
               <button type="submit" class="reply-post-btn">Gửi</button>
             </form>
         </div>
@@ -410,6 +437,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitBtn = document.getElementById('submit-comment');
   const cancelBtn = document.getElementById('cancel-comment');
 
+  const charCount = document.getElementById('comment-char-count');
+
   if (commentTextarea) {
     // 1. Tự động giãn chiều cao textarea khi gõ (Auto-resize)
     commentTextarea.addEventListener('input', function() {
@@ -421,6 +450,9 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.removeAttribute('disabled');
       } else {
         submitBtn.setAttribute('disabled', 'true');
+      }
+      if (charCount) {
+        charCount.textContent = `${this.value.length} / ${COMMENT_MAX}`;
       }
     });
 
@@ -435,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
       commentTextarea.style.height = 'auto'; // Thu nhỏ về ban đầu
       submitBtn.setAttribute('disabled', 'true'); // Khóa nút gửi
       commentForm.classList.remove('is-active'); // Ẩn cụm nút
+      if (charCount) charCount.textContent = `0 / ${COMMENT_MAX}`;
     });
   }
 });
@@ -448,7 +481,10 @@ window.submitReply = async function(event, parentId) {
   const content = textarea.value.trim();
   const url = form.getAttribute('action');
 
-  if (!content) return showToast('Vui lòng nhập nội dung trả lời!', 'error');
+  if (!content) return showToast('Bình luận không được để trống', 'error');
+  if (content.length > COMMENT_MAX) {
+    return showToast(`Nội dung không quá ${COMMENT_MAX} ký tự`, 'error');
+  }
 
   const submitBtn = form.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
@@ -517,16 +553,15 @@ function createReplyHTML(c) {
       <p class="c-content">${c.content}</p>
       
       <div class="c-actions">
-        <button class="c-action-btn" onclick="toggleReply('${c.id}')">Trả lời</button>
-        <!-- Thêm nút Xóa vì bình luận này do chính user hiện tại vừa tạo -->
-        <button class="c-action-btn" style="color: #ef4444;" onclick="deleteComment('${c.id}')">Xóa</button>
-        <button class="c-action-btn" onclick="openReport('${c.id}')">Báo cáo</button>
+        <button type="button" class="c-action-btn" onclick="toggleReply('${c.id}')">Trả lời</button>
+        <button type="button" class="c-action-btn" style="color: #ef4444;" data-delete-comment="${c.id}">Xóa</button>
+        <button type="button" class="c-action-btn" onclick="openReport('${c.id}')">Báo cáo</button>
       </div>
       
       <div class="reply-form-area" id="reply-${c.id}" style="display:none; margin-top: 10px;">
         <form action="/learn/${window.LEARN_CONFIG.courseId}/${window.LEARN_CONFIG.lessonId}/comments" method="POST" onsubmit="submitReply(event, '${c.id}')">
           <input type="hidden" name="parentId" value="${c.id}">
-          <textarea name="content" placeholder="Phản hồi đến ${c.username}..." rows="2" style="width: 100%; padding: 8px; border-radius: 6px;"></textarea>
+          <textarea name="content" placeholder="Phản hồi đến ${c.username}..." rows="2" style="width: 100%; padding: 8px; border-radius: 6px;" maxlength="${COMMENT_MAX}"></textarea>
           <div style="margin-top: 8px; text-align: right;">
             <button type="submit" class="reply-post-btn">Gửi câu trả lời</button>
           </div>
@@ -536,44 +571,74 @@ function createReplyHTML(c) {
   `;
 }
 
-window.deleteComment = async function(commentId) {
-  if (!confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return;
+let _pendingDeleteCommentId = null;
 
+function closeDeleteCommentModal() {
+  _pendingDeleteCommentId = null;
+  const overlay = document.getElementById('delete-comment-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+}
+
+async function runDeleteComment(commentId) {
   try {
-    // Gọi API DELETE
     const response = await fetch(`/learn/${CFG.courseId}/${CFG.lessonId}/comments/${commentId}`, {
       method: 'DELETE',
-      headers: {
-        'Accept': 'application/json'
-      }
+      headers: { Accept: 'application/json' },
     });
-
     const data = await response.json();
-
     if (data.success) {
       const cmtDiv = document.getElementById(`cmt-${commentId}`);
       if (cmtDiv) {
-        // Thay vì xóa hẳn DOM (làm mất comment con), ta đổi giao diện sang trạng thái "Đã xóa"
         const contentP = cmtDiv.querySelector(':scope > .c-content');
         const actionsDiv = cmtDiv.querySelector(':scope > .c-actions');
-
         if (contentP) {
           contentP.className = 'c-deleted';
           contentP.textContent = '[Bình luận đã bị xóa]';
         }
-        
-        // Ẩn cụm nút Trả lời / Xóa / Báo cáo đi
-        if (actionsDiv) {
-          actionsDiv.style.display = 'none'; 
-        }
-
-        showToast('Đã xóa bình luận', 'success');
+        if (actionsDiv) actionsDiv.style.display = 'none';
+        const replyBox = cmtDiv.querySelector(':scope > .reply-form-area');
+        if (replyBox) replyBox.style.display = 'none';
       }
+      showToast('Xoá bình luận thành công', 'success');
     } else {
       showToast(data.message || 'Lỗi khi xóa bình luận', 'error');
     }
   } catch (error) {
     console.error('Lỗi:', error);
     showToast('Không thể kết nối đến máy chủ', 'error');
+  } finally {
+    closeDeleteCommentModal();
   }
-};
+}
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-delete-comment]');
+  if (!btn) return;
+  e.preventDefault();
+  _pendingDeleteCommentId = btn.getAttribute('data-delete-comment');
+  const overlay = document.getElementById('delete-comment-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const cancelDel = document.getElementById('delete-modal-cancel');
+  const confirmDel = document.getElementById('delete-modal-confirm');
+  const overlay = document.getElementById('delete-comment-overlay');
+  if (cancelDel) cancelDel.addEventListener('click', closeDeleteCommentModal);
+  if (overlay) {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeDeleteCommentModal();
+    });
+  }
+  if (confirmDel) {
+    confirmDel.addEventListener('click', () => {
+      if (_pendingDeleteCommentId) runDeleteComment(_pendingDeleteCommentId);
+    });
+  }
+});

@@ -25,10 +25,21 @@ const courseController = {
       const course = await courseService.getCourseDetail(id);
       if (!course) return res.status(404).render('errors/404', { layout: false });
       
-      // Fetch reviews
-      const reviews = await reviewService.getReviewsByCourseId(id);
-      
-      // Check if current user already reviewed
+      const allReviews = await reviewService.getReviewsByCourseId(id);
+      const reviewTotalCount = allReviews.length;
+
+      const rawStar = req.query.reviewStars;
+      const reviewFilter =
+        rawStar !== undefined && rawStar !== '' && rawStar !== 'all'
+          ? parseInt(String(rawStar), 10)
+          : null;
+      const validFilter =
+        reviewFilter !== null && reviewFilter >= 1 && reviewFilter <= 5 ? reviewFilter : null;
+
+      const reviews = validFilter
+        ? allReviews.filter((r) => r.ratingNum === validFilter)
+        : allReviews;
+
       const user = res.locals.user || null;
       let userReview = null;
       if (user) {
@@ -41,10 +52,9 @@ const courseController = {
         enroll = true;
         lessonId = await courseService.getFirstUncompletedLessonId(user.id, id);
       }
-      // Rating distribution (1–5)
 
-      const ratingDist = [0, 0, 0, 0, 0]; // index 0 = 1 star, index 4 = 5 stars
-      reviews.forEach(r => {
+      const ratingDist = [0, 0, 0, 0, 0];
+      allReviews.forEach((r) => {
         if (r.ratingNum >= 1 && r.ratingNum <= 5) {
           ratingDist[r.ratingNum - 1]++;
         }
@@ -54,11 +64,14 @@ const courseController = {
         title: `${course.name} – E-learn`,
         course,
         reviews,
+        reviewTotalCount,
+        reviewFilter: validFilter,
         userReview,
         ratingDist,
         user,
         enroll,
-        lessonId
+        lessonId,
+        enrollSuccess: req.query.success === 'enrolled',
       });
     } catch (error) {
       console.error('Lỗi trang chi tiết khóa học:', error.message);
@@ -109,7 +122,7 @@ const courseController = {
       const courseId = req.params.id;
       await courseService.enrollUserToCourse(user.id, courseId);
 
-      res.redirect(`/courses/${courseId}`);
+      res.redirect(`/courses/${courseId}?success=enrolled`);
     } catch (error) {
       console.error('Lỗi tham gia khóa học:', error.message);
       res.redirect(`/courses/${req.params.id}?error=server`);
