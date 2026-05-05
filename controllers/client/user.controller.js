@@ -1,5 +1,7 @@
 'use strict';
+const crypto = require('crypto');
 const userService = require('../../services/user.service');
+const certificateModel = require('../../models/certificate.model');
 
 const userController = {
   /**
@@ -132,19 +134,45 @@ const userController = {
         return res.redirect('/my-courses?error=not_eligible_for_certificate');
       }
 
-      // Render trang chứng chỉ (Bạn cần tạo file EJS cho trang này)
+      // Tìm hoặc tạo chứng chỉ trong DB
+      let cert = await certificateModel.findByUserAndCourse(user.id, courseId);
+      if (!cert) {
+        const verifyCode = crypto.randomBytes(32).toString('hex');
+        await certificateModel.create(user.id, courseId, verifyCode);
+        cert = await certificateModel.findByUserAndCourse(user.id, courseId);
+      }
+
       res.render('client/user/certificate', {
         title: `Chứng chỉ - ${progressData.name}`,
         user: user,
         course: progressData,
-        // Nếu completedDate bị null (do data cũ chưa có), lấy ngày hiện tại
-        issueDate: progressData.completedDate || new Date(), 
-        percent: percent
+        issueDate: cert.issuedAt || progressData.completedDate || new Date(),
+        percent: percent,
+        verifyCode: cert.verifyCode,
+        verifyUrl: `${process.env.APP_URL}/certificate/verify/${cert.verifyCode}`,
       });
 
     } catch (err) {
       console.error('Lỗi lấy chứng chỉ:', err);
       res.redirect('/my-courses?error=something_went_wrong');
+    }
+  },
+  // GET /certificate/verify/:code  (public - không cần đăng nhập)
+  verifyCertificate: async (req, res) => {
+    try {
+      const { code } = req.params;
+      const cert = await certificateModel.findByVerifyCode(code);
+      if (!cert) {
+        return res.status(404).render('errors/404', { layout: false });
+      }
+      res.render('client/user/verify-certificate', {
+        title: 'Xác minh chứng chỉ',
+        layout: false,
+        cert,
+      });
+    } catch (err) {
+      console.error('Lỗi verify certificate:', err);
+      res.redirect('/');
     }
   },
 };

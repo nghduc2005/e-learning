@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const userModel = require('../../models/user.model');
 const refreshTokenModel = require('../../models/refreshToken.model');
 const emailVerificationModel = require('../../models/emailVerification.model');
-const { sendVerificationEmail } = require('../../services/email.service');
+const { sendVerificationEmail, sendPasswordResetEmail } = require('../../services/email.service');
+const passwordResetModel = require('../../models/passwordReset.model');
 
 const hashPassword = (p) => crypto.createHash('sha256').update(p).digest('hex');
 
@@ -208,7 +209,89 @@ const authController = {
     }
     clearAuthCookies(res);
     res.redirect('/login');
-  }
+  },
+
+  // GET /forgot-password
+  forgotPasswordPage: (req, res) => {
+    if (isLoggedIn(req)) return res.redirect('/');
+    res.render('client/auth/forgot-password', { layout: false, error: null, success: null });
+  },
+
+  // POST /forgot-password
+  forgotPasswordPost: async (req, res) => {
+    const render = (error, success) =>
+      res.render('client/auth/forgot-password', { layout: false, error, success });
+
+    const email = (req.body.email || '').trim().toLowerCase();
+    if (!email) return render('Vui lòng nhập địa chỉ email.', null);
+
+    try {
+      const user = await userModel.findByEmail(email);
+      // Luôn trả về thông báo thành công để tránh lộ thông tin tài khoản
+      if (!user || user.status === 'banned') {
+        return render(null, 'Nếu email tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.');
+      }
+
+      const token = crypto.randomBytes(32).toString('hex');
+      const expiredAt = new Date(Date.now() + 60 * 60 * 1000); // 1 giờ
+      await passwordResetModel.create({ userId: user.id, token, expiredAt });
+      await sendPasswordResetEmail(user.email, user.username, token);
+
+      render(null, 'Nếu email tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn đặt lại mật khẩu.');
+    } catch (err) {
+      console.error('Lỗi forgot-password:', err);
+      render('Đã xảy ra lỗi hệ thống, vui lòng thử lại.', null);
+    }
+  },
+
+  // GET /reset-password?token=...
+  resetPasswordPage: async (req, res) => {
+    if (isLoggedIn(req)) return res.redirect('/');
+    const { token } = req.query;
+    if (!token) return res.redirect('/forgot-password');
+
+    const record = await passwordResetModel.findValidByToken(token).catch(() => null);
+    if (!record) {
+      return res.render('client/auth/reset-password', {
+        layout: false,
+        token: null,
+        error: 'Liên kết đặt lại mật khẩu đã hết hạn hoặc không hợp lệ.',
+        success: null,
+      });
+    }
+    res.render('client/auth/reset-password', { layout: false, token, error: null, success: null });
+  },
+
+  // POST /reset-password
+  resetPasswordPost: async (req, res) => {
+    const { token, password, confirmPassword } = req.body;
+
+    const renderErr = (error) =>
+      res.render('client/auth/reset-password', { layout: false, token, error, success: null });
+
+    if (!token) return res.redirect('/forgot-password');
+    if (!password || password.length < 6) return renderErr('Mật khẩu phải có ít nhất 6 ký tự.');
+    if (password !== confirmPassword) return renderErr('Mật khẩu xác nhận không khớp.');
+
+    try {
+      const record = await passwordResetModel.findValidByToken(token);
+      if (!record) return renderErr('Liên kết đã hết hạn hoặc không hợp lệ.');
+
+      const hashed = crypto.createHash('sha256').update(password).digest('hex');
+      await userModel.updatePassword(record.userId, hashed);
+      await passwordResetModel.markUsed(record.id);
+      // Thu hồi tất cả refresh token để buộc đăng nhập lại
+      await refreshTokenModel.revokeAllForUser(record.userId);
+
+      res.render('client/auth/reset-password', {
+        layout: false, token: null, error: null,
+        success: 'Đặt lại mật khẩu thành công! Bạn có thể đăng nhập ngay bây giờ.',
+      });
+    } catch (err) {
+      console.error('Lỗi reset-password:', err);
+      renderErr('Đã xảy ra lỗi hệ thống, vui lòng thử lại.');
+    }
+  },
 };
 
 module.exports = authController;
