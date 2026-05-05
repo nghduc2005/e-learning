@@ -72,6 +72,7 @@ const courseController = {
         enroll,
         lessonId,
         enrollSuccess: req.query.success === 'enrolled',
+        reviewSuccess: req.query.success === 'reviewed',
       });
     } catch (error) {
       console.error('Lỗi trang chi tiết khóa học:', error.message);
@@ -106,7 +107,7 @@ const courseController = {
         ratingNum: rating,
       });
 
-      res.redirect(`/courses/${courseId}#reviews-section`);
+      res.redirect(`/courses/${courseId}?success=reviewed#reviews-section`);
     } catch (error) {
       console.error('Lỗi gửi đánh giá:', error.message);
       res.redirect(`/courses/${req.params.id}?error=server`);

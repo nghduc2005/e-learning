@@ -48,6 +48,9 @@
     <% if (typeof enrollSuccess !== 'undefined' && enrollSuccess) { %>
       <div class="cd-flash cd-flash--success" role="status">Đăng ký khoá học thành công! Bạn có thể bắt đầu học ngay.</div>
     <% } %>
+    <% if (typeof reviewSuccess !== 'undefined' && reviewSuccess) { %>
+      <div class="cd-flash cd-flash--success" role="status">Đánh giá khoá học thành công! Cảm ơn bạn đã chia sẻ.</div>
+    <% } %>
 
     <!-- Left: Curriculum -->
     <main class="cd-main">
@@ -1146,14 +1149,14 @@ document.querySelectorAll('.cd-unit-header').forEach(btn => {
   });
 })();
 
-<% if (typeof enrollSuccess !== 'undefined' && enrollSuccess) { %>
+<% if ((typeof enrollSuccess !== 'undefined' && enrollSuccess) || (typeof reviewSuccess !== 'undefined' && reviewSuccess)) { %>
 setTimeout(() => {
-  const el = document.querySelector('.cd-flash--success');
-  if (el) {
+  const els = document.querySelectorAll('.cd-flash--success');
+  els.forEach(el => {
     el.style.transition = 'opacity 0.4s';
     el.style.opacity = '0';
     setTimeout(() => el.remove(), 450);
-  }
+  });
 }, 4500);
 <% } %>
 </script>
