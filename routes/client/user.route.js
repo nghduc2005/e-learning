@@ -8,4 +8,5 @@ router.post('/profile/update', uploadCloud.single('avatar'), userController.upda
 router.post('/profile/change-password', userController.changePassword);
 router.get('/my-courses', userController.myCourses);
 router.get('/certificate/:courseId', userController.viewCertificate);
+router.get('/certificate/verify/:code', userController.verifyCertificate);
 module.exports = router;

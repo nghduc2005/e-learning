@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <title>Xác minh chứng chỉ – E-Learning</title>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4">
+
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-32 -right-32 w-96 h-96 bg-green-100 rounded-full blur-3xl opacity-70"></div>
+    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-70"></div>
+  </div>
+
+  <div class="w-full max-w-lg relative z-10">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full shadow-lg shadow-green-200 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-900">Chứng chỉ hợp lệ</h1>
+      <p class="text-gray-500 text-sm mt-1">Chứng chỉ này đã được xác minh bởi E-Learning Platform</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 p-8 border border-gray-100">
+      <div class="flex items-center gap-4 mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-green-800 font-semibold text-sm">Đã xác minh thành công</p>
+          <p class="text-green-600 text-xs mt-0.5">Chứng chỉ này là thật và được cấp bởi E-Learning Platform</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="flex justify-between items-center py-3 border-b border-gray-100">
+          <span class="text-gray-500 text-sm">Học viên</span>
+          <span class="font-semibold text-gray-900"><%= cert.username %></span>
+        </div>
+        <div class="flex justify-between items-center py-3 border-b border-gray-100">
+          <span class="text-gray-500 text-sm">Khoá học</span>
+          <span class="font-semibold text-gray-900 text-right max-w-xs"><%= cert.courseName %></span>
+        </div>
+        <div class="flex justify-between items-center py-3 border-b border-gray-100">
+          <span class="text-gray-500 text-sm">Ngày cấp</span>
+          <span class="font-semibold text-gray-900"><%= new Date(cert.issuedAt).toLocaleDateString('vi-VN') %></span>
+        </div>
+        <div class="flex justify-between items-center py-3">
+          <span class="text-gray-500 text-sm">Mã xác minh</span>
+          <span class="font-mono text-xs text-gray-400 break-all text-right max-w-xs"><%= cert.verifyCode %></span>
+        </div>
+      </div>
+
+      <div class="mt-6 text-center">
+        <a href="/" class="text-sm text-gray-500 hover:text-green-600 transition">
+          Về trang chủ E-Learning
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
