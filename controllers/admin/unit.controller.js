@@ -71,10 +71,13 @@ const unitController = {
 
       await logAction(req.session.admin?.id, 'create_unit', `Tạo chương: ${req.body.title}`);
 
+      req.session.flash = { type: 'success', message: 'Tạo chương thành công!' };
+
       res.json({
         data: {
           ok: 1,
-          message: "Tạo chương thành công!"
+          message: "Tạo chương thành công!",
+          redirectUrl: "/admin/unit/list"
         }
       });
     } catch (error) {
@@ -114,10 +117,13 @@ const unitController = {
 
       await logAction(req.session.admin?.id, 'update_unit', `Cập nhật chương: ${req.body.title}`);
 
+      req.session.flash = { type: 'success', message: 'Cập nhật chương thành công!' };
+
       res.json({
         data: {
           ok: 1,
-          message: "Cập nhật chương thành công!"
+          message: "Cập nhật chương thành công!",
+          redirectUrl: "/admin/unit/list"
         }
       });
     } catch (error) {
@@ -133,6 +139,8 @@ const unitController = {
 
       await logAction(req.session.admin?.id, 'delete_unit', `Xóa chương #${id}`);
 
+      req.session.flash = { type: 'success', message: 'Xóa chương thành công!' };
+
       const backURL = req.header('Referer') || '/admin/unit/list';
       res.redirect(backURL);
     } catch (error) {
@@ -147,6 +155,8 @@ const unitController = {
       await unitService.restoreUnit(id);
 
       await logAction(req.session.admin?.id, 'restore_unit', `Khôi phục chương #${id}`);
+
+      req.session.flash = { type: 'success', message: 'Khôi phục chương thành công!' };
 
       const backURL = req.header('Referer') || '/admin/trash';
       res.redirect(backURL);

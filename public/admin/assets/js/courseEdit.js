@@ -31,6 +31,7 @@ const editCourseForm = document.getElementById("editCourseForm");
 validation
     .addField('#title', [
         { rule: 'required', errorMessage: 'Tên khóa học không được để trống' },
+        { rule: 'maxLength', value: 256, errorMessage: 'Tên khóa học không được vượt quá 256 ký tự' }
     ], {
         errorsContainer: '#title-error'
     })
@@ -98,10 +99,12 @@ validation
             // Xử lý sau khi thành công
             if (response.data.data.ok) {
                 // Ví dụ redirect về danh sách
-                if (window.opener) { window.close(); } else { window.history.back(); }
+                if (window.opener) { window.close(); } else { window.location.href = response.data.data.redirectUrl || document.referrer; }
             }
         } catch (error) {
             console.error('Lỗi khi gửi dữ liệu cập nhật:', error);
+            const errorMsg = error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại!';
+            alert('Lỗi: ' + errorMsg);
         } finally {
             loadingOverlay.classList.add('hidden');
         }

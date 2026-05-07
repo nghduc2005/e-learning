@@ -22,6 +22,7 @@ const loadingOverlay = document.getElementById('loadingOverlay');
     validation
         .addField('#title', [
             { rule: 'required', errorMessage: 'Tên khóa học không được để trống' },
+            { rule: 'maxLength', value: 256, errorMessage: 'Tên khóa học không được vượt quá 256 ký tự' }
         ], {
             errorsContainer: '#title-error'
         })
@@ -78,10 +79,12 @@ const loadingOverlay = document.getElementById('loadingOverlay');
             try {
                 const response = await axios.post("/admin/course/create", formData)
                 if (response.data.data.ok) {
-                    if (window.opener) { window.close(); } else { window.history.back(); }
+                    if (window.opener) { window.close(); } else { window.location.href = response.data.data.redirectUrl || document.referrer; }
                 }
             } catch (error) {
                 console.error('Lỗi khi gửi dữ liệu:', error);
+                const errorMsg = error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại!';
+                alert('Lỗi: ' + errorMsg);
             } finally {
                 loadingOverlay.classList.add('hidden');
             }

@@ -34,7 +34,7 @@
                   Chế độ học <span class="text-red-600">*</span>
               </label>
               <div class="relative">
-                  <select id="learnMode" name="learnMode" onchange="toggleUploadMode(this.value)"
+                  <select id="learnMode" name="learnMode" onchange="toggleUploadMode(this.value)" data-initial-mode="<%= lesson.learnMode %>"
                       class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-gray-700 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em]"
                       style="background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22none%22 viewBox=%220 0 24 24%22 stroke=%22%236b7280%22%3E%3Cpath stroke-linecap=%22round%22 stroke-linejoin=%22round%22 stroke-width=%222%22 d=%22M19 9l-7 7-7-7%22/%3E%3C/svg%3E');">
                       <option value="video" <%= lesson.learnMode === 'video' ? 'selected' : '' %>>Học qua Video</option>

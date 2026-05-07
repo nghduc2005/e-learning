@@ -23,23 +23,34 @@
         <div class="lesson-breadcrumb"><%= course.name %></div>
         <h1 class="lesson-title" style="margin:0;"><%= lesson.name %></h1> 
       </div>
-      <button
-        id="complete-btn"
-        class="complete-btn <%= lessonProgress && lessonProgress.isCompleted ? 'is-done' : '' %>"
-        data-lesson-id="<%= lesson.id %>"
-        data-course-id="<%= course.id %>"
-        <%= lessonProgress && lessonProgress.isCompleted ? 'disabled' : '' %>
-        aria-label="<%= lessonProgress && lessonProgress.isCompleted ? 'Bài học đã hoàn thành' : 'Đánh dấu hoàn thành bài học' %>"
-      >
-        <%= lessonProgress && lessonProgress.isCompleted ? 'Đã hoàn thành' : 'Đánh dấu hoàn thành' %>
-      </button>
+      <% if (lesson.passScore > 0 && questions.length > 0) { %>
+        <button
+          id="go-to-quiz-btn"
+          class="complete-btn <%= lessonProgress && lessonProgress.isCompleted ? 'is-done' : '' %>"
+          onclick="document.querySelector('[data-tab=quiz]').click();"
+          <%= lessonProgress && lessonProgress.isCompleted ? 'disabled' : '' %>
+        >
+          <%= lessonProgress && lessonProgress.isCompleted ? 'Đã hoàn thành' : 'Làm bài kiểm tra' %>
+        </button>
+      <% } else { %>
+        <button
+          id="complete-btn"
+          class="complete-btn <%= lessonProgress && lessonProgress.isCompleted ? 'is-done' : '' %>"
+          data-lesson-id="<%= lesson.id %>"
+          data-course-id="<%= course.id %>"
+          <%= lessonProgress && lessonProgress.isCompleted ? 'disabled' : '' %>
+          aria-label="<%= lessonProgress && lessonProgress.isCompleted ? 'Bài học đã hoàn thành' : 'Đánh dấu hoàn thành bài học' %>"
+        >
+          <%= lessonProgress && lessonProgress.isCompleted ? 'Đã hoàn thành' : 'Đánh dấu hoàn thành' %>
+        </button>
+      <% } %>
     </header>
 
   
     <% if (lesson.learnMode === 'video') { %>
       <div class="learn-player">
         <div class="video-wrapper">
-          <div class="video-loading" id="video-loading" aria-live="polite">
+          <div class="video-loading is-hidden" id="video-loading" aria-live="polite">
             <span class="video-loading-spinner" aria-hidden="true"></span>
             <span>Đang tải video…</span>
           </div>
@@ -85,7 +96,23 @@
           <article class="article-reader">
             <h2><%= lesson.name %></h2> 
             
-            <%- lesson.content %>
+            <% 
+              // Kiểm tra xem nội dung có phải là link PDF hay không
+              const isPdf = typeof lesson.content === 'string' && (lesson.content.toLowerCase().endsWith('.pdf') || lesson.content.includes('pdf'));
+            %>
+
+            <% if (isPdf) { %>
+              <div class="pdf-viewer-container" style="margin-top: 20px;">
+                <iframe 
+                  src="https://docs.google.com/viewer?url=<%= encodeURIComponent(lesson.content) %>&embedded=true" 
+                  width="100%" 
+                  height="800px" 
+                  style="border: 1px solid #1e293b; border-radius: 8px;">
+                </iframe>
+              </div>
+            <% } else { %>
+              <%- lesson.content %>
+            <% } %>
           </article>
         <% } else { %>
           <h2 style="color:#e2e8f0; margin-top:0;"><%= lesson.name %></h2>
@@ -466,6 +493,4 @@
     window.LEARN_CONFIG = { courseId: null, lessonId: null, learnMode: "", isCompleted: false };
   }
 </script>
-<script src="https://www.youtube.com/iframe_api"></script>
-<!-- 3. CUỐI CÙNG mới tải file JS xử lý (để file JS có thể lấy được dữ liệu đã sinh ra ở bước 2) -->
 <script src="/client/assets/js/learn.js"></script>

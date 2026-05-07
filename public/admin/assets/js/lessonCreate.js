@@ -359,10 +359,12 @@ validation
               }
           })
             if (response.data.redirectUrl) {
-                if (window.opener) { window.close(); } else { window.history.back(); }
+                if (window.opener) { window.close(); } else { window.location.href = response.data.redirectUrl || document.referrer; }
             }
         } catch (error) {
-          console.log(error.response?.data || error);
+            console.error('Lỗi khi tạo bài học:', error);
+            const errorMsg = error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại!';
+            alert('Lỗi: ' + errorMsg);
         } finally {
             loadingOverlay.classList.add('hidden');
         }

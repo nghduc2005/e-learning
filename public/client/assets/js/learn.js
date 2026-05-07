@@ -255,9 +255,7 @@ document.addEventListener('click', e => {
   if (overlay && e.target === overlay) closeReport();
 });
 
-// ─── Video progress tracking ──────────────────────────
-
-// ─── Video progress tracking (Sử dụng YouTube API) ───
+// ─── Video progress tracking ───
 
 if (CFG.learnMode === 'video') {
   const video = document.getElementById('lesson-video');
@@ -265,7 +263,11 @@ if (CFG.learnMode === 'video') {
 
   if (video) {
     if (loadingEl) {
-      video.addEventListener('loadstart', () => loadingEl.classList.remove('is-hidden'));
+      if (video.readyState < 3) {
+        loadingEl.classList.remove('is-hidden');
+      }
+      video.addEventListener('waiting', () => loadingEl.classList.remove('is-hidden'));
+      video.addEventListener('playing', () => loadingEl.classList.add('is-hidden'));
       video.addEventListener('canplay', () => loadingEl.classList.add('is-hidden'));
       video.addEventListener('error', () => {
         loadingEl.classList.remove('is-hidden');

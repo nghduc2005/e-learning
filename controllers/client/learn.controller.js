@@ -14,6 +14,10 @@ const learnController = {
       const courseId = parseInt(req.params.courseId);
       const lessonId = parseInt(req.params.lessonId);
 
+      if (isNaN(courseId) || isNaN(lessonId)) {
+        return res.status(404).render('errors/404', { layout: false });
+      }
+
       // Kiểm tra đã đăng ký khóa học
       const enrollment = await courseModel.findUserCourse(user.id, courseId);
       if (!enrollment) return res.redirect(`/courses/${courseId}`);
@@ -40,6 +44,25 @@ const learnController = {
       });
       // =========================================================
 
+      // Phẳng hoá mảng bài học để lấy Prev / Next lesson
+      const allLessons = [];
+      course.units.forEach(u => u.lessons.forEach(l => allLessons.push(l)));
+      
+      const idx = allLessons.findIndex(l => l.id === lessonId);
+      if (idx === -1) {
+         return res.status(404).render('errors/404', { layout: false });
+      }
+      
+      // Chặn truy cập nếu bài học bị khóa hoặc thuộc chương bị khóa
+      const currentLessonInfo = allLessons[idx];
+      if (currentLessonInfo.status === 'locked') {
+         req.session.flash = { type: 'error', message: 'Bài học này đang bị khóa!' };
+         return res.redirect(`/courses/${courseId}`);
+      }
+
+      const prevLesson = idx > 0 ? allLessons[idx - 1] : null;
+      const nextLesson = idx < allLessons.length - 1 ? allLessons[idx + 1] : null;
+
       // Lấy thông tin bài học hiện tại (kèm tài liệu + câu hỏi)
       const lesson = await lessonModel.findById(lessonId);
       if (!lesson) return res.status(404).render('errors/404', { layout: false });
@@ -47,14 +70,6 @@ const learnController = {
       const questionsForView = (lesson.passScore > 0 && lesson.questionsList?.length)
         ? lesson.questionsList.map(q => ({ id: q.id, content: q.content, answers: q.answers }))
         : [];
-
-      // Phẳng hoá mảng bài học để lấy Prev / Next lesson
-      const allLessons = [];
-      course.units.forEach(u => u.lessons.forEach(l => allLessons.push(l)));
-      
-      const idx = allLessons.findIndex(l => l.id === lessonId);
-      const prevLesson = idx > 0 ? allLessons[idx - 1] : null;
-      const nextLesson = idx < allLessons.length - 1 ? allLessons[idx + 1] : null;
 
       // Tiến độ bài học hiện tại (lấy từ Map để truyền xuống Progress Bar)
       const lessonProgress = progressMap[lessonId] || null;
@@ -90,6 +105,17 @@ const learnController = {
     try {
       const user = res.locals.user;
       if (!user) return res.status(401).json({ success: false, message: 'Chưa đăng nhập' });
+
+      // CẬP NHẬT: Ngăn chặn lỗ hổng click Đánh dấu hoàn thành để bỏ qua bài tập
+      const { lessonModel } = await import('../../models/lesson.model.js');
+      const lesson = await lessonModel.findById(parseInt(req.params.lessonId));
+      if (!lesson) return res.status(404).json({ success: false, message: 'Không tìm thấy bài học' });
+      
+      // Nếu bài học yêu cầu điểm (Quiz), KHÔNG CHO PHÉP gọi API markComplete thủ công
+      if (lesson.passScore > 0 && lesson.questionsList && lesson.questionsList.length > 0) {
+        return res.status(403).json({ success: false, message: 'Bạn phải hoàn thành bài kiểm tra để qua môn!' });
+      }
+
       const { progressModel } = await import('../../models/progress.model.js');
       await progressModel.markComplete(user.id, parseInt(req.params.lessonId));
       return res.json({ success: true });

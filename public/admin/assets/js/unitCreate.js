@@ -15,6 +15,7 @@ const createCourseForm = document.getElementById("createCourseForm")
 validation
     .addField('#title', [
         { rule: 'required', errorMessage: 'Tên chương không được để trống' },
+        { rule: 'maxLength', value: 256, errorMessage: 'Tên chương không được vượt quá 256 ký tự' }
     ], {
         errorsContainer: '#title-error'
     })
@@ -41,10 +42,12 @@ validation
         try {
             const response = await axios.post("/admin/unit/create", finalData)
             if (response.data.data.ok) {
-                if (window.opener) { window.close(); } else { window.history.back(); }
+                if (window.opener) { window.close(); } else { window.location.href = response.data.data.redirectUrl || document.referrer; }
             }
         } catch (error) {
             console.error('Lỗi khi gửi dữ liệu:', error);
+            const errorMsg = error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại!';
+            alert('Lỗi: ' + errorMsg);
         } finally {
             loadingOverlay.classList.add('hidden');
         }

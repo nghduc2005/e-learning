@@ -77,6 +77,8 @@ export const lessonController = {
 
       await logAction(req.session.admin?.id, 'create_lesson', `Tạo bài học: ${title}`);
 
+      req.session.flash = { type: 'success', message: 'Tạo bài học thành công!' };
+
       res.json({ success: true, redirectUrl: '/admin/lesson/list' });
     } catch (error) {
       console.error(error);
@@ -127,6 +129,8 @@ export const lessonController = {
 
       await logAction(req.session.admin?.id, 'update_lesson', `Cập nhật bài học: ${title}`);
 
+      req.session.flash = { type: 'success', message: 'Cập nhật bài học thành công!' };
+
       res.json({ success: true, redirectUrl: '/admin/lesson/list' });
     } catch (error) {
       console.error(error);
@@ -140,6 +144,8 @@ export const lessonController = {
       await lessonService.deleteLesson(id);
 
       await logAction(req.session.admin?.id, 'delete_lesson', `Xóa bài học #${id}`);
+
+      req.session.flash = { type: 'success', message: 'Xóa bài học thành công!' };
 
       const backURL = req.header('Referer') || '/admin/lesson/list';
       res.redirect(backURL);
@@ -155,6 +161,8 @@ export const lessonController = {
       await lessonService.restoreLesson(id);
 
       await logAction(req.session.admin?.id, 'restore_lesson', `Khôi phục bài học #${id}`);
+
+      req.session.flash = { type: 'success', message: 'Khôi phục bài học thành công!' };
 
       const backURL = req.header('Referer') || '/admin/trash';
       res.redirect(backURL);

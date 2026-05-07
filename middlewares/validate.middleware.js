@@ -11,12 +11,13 @@ export const courseSchema = Joi.object({
   status: Joi.string().valid('hidden', 'active', 'locked').messages({
     'any.only': 'Trạng thái phải là một trong các giá trị hợp lệ.'
   }),
-  banner: Joi.string().pattern(/^https:\/\/res\.cloudinary\.com\//).messages({
+  banner: Joi.string().pattern(/^https:\/\/res\.cloudinary\.com\//).allow('', null).optional().messages({
     'string.pattern.base': 'Link ảnh banner phải bắt đầu bằng đường dẫn từ Cloudinary (https://res.cloudinary.com/).'
   }),
-  description: Joi.string().trim().messages({
+  description: Joi.string().trim().allow('', null).optional().messages({
     'string.base': 'Mô tả phải là một chuỗi văn bản.'
-  })
+  }),
+  deleteBanner: Joi.any().optional()
 })
 
 export const unitSchema = Joi.object({
@@ -97,7 +98,7 @@ export const editLessonSchema = Joi.object({
     'number.min': 'Số câu hỏi cần đạt không được nhỏ hơn 0.',
     'any.required': 'Số câu hỏi cần đạt là trường bắt buộc.'
   }),
-  content: Joi.string().pattern(/^https:\/\/res\.cloudinary\.com\//).optional().messages({
+  content: Joi.string().pattern(/^https:\/\/res\.cloudinary\.com\//).allow('', null).optional().messages({
     'string.pattern.base': 'Link nội dung bài giảng phải là đường dẫn hợp lệ từ Cloudinary.'
   }),
   document: Joi.array().items(

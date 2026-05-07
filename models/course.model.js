@@ -184,14 +184,14 @@ export const courseModel = {
       ORDER BY ul.position ASC, l.id ASC
     `, [userId || 0, course.curriculumId]); // Nếu chưa đăng nhập thì userId = 0 (an toàn)
 
-    // 4. Nhóm các bài học vào từng chương tương ứng bằng JavaScript
     units.forEach(unit => {
       // Ép kiểu isCompleted về Boolean cho frontend dễ xử lý
       unit.lessons = allLessons
         .filter(lesson => lesson.unitId === unit.id)
         .map(lesson => ({
           ...lesson,
-          isCompleted: Boolean(lesson.isCompleted)
+          isCompleted: Boolean(lesson.isCompleted),
+          status: unit.status === 'locked' ? 'locked' : lesson.status
         }));
     });
 
@@ -246,11 +246,13 @@ export const courseModel = {
     const uncompletedQuery = `
       SELECT l.id AS lessonId
       FROM unit_lessons ul
+      JOIN units u ON u.id = ul.unitId
       JOIN lessons l ON l.id = ul.lessonId
       LEFT JOIN lesson_progress lp ON lp.lessonId = ul.lessonId AND lp.userId = ?
       WHERE ul.curriculumId = (
         SELECT curriculumId FROM courses WHERE id = ? AND deletedAt IS NULL
       )
+      AND u.status != 'locked'
       AND l.status = 'active' /* CHỈ LẤY BÀI ACTIVE */
       AND l.deletedAt IS NULL
       AND (lp.isCompleted IS NULL OR lp.isCompleted = 0)
@@ -269,11 +271,13 @@ export const courseModel = {
     const completedQuery = `
       SELECT l.id AS lessonId
       FROM unit_lessons ul
+      JOIN units u ON u.id = ul.unitId
       JOIN lessons l ON l.id = ul.lessonId
       JOIN lesson_progress lp ON lp.lessonId = ul.lessonId AND lp.userId = ?
       WHERE ul.curriculumId = (
         SELECT curriculumId FROM courses WHERE id = ? AND deletedAt IS NULL
       )
+      AND u.status != 'locked'
       AND l.status = 'active' /* CHỈ LẤY BÀI ACTIVE */
       AND l.deletedAt IS NULL
       AND lp.isCompleted = 1

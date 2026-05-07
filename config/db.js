@@ -10,6 +10,10 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000, // Thay đổi thành 10000ms để hiệu quả hơn trên Windows
+  idleTimeout: 60000,           // Giải phóng kết nối rảnh rỗi sau 60s (TiDB sẽ tự đóng kết nối sau khoảng 5-10p, ta cần đóng trước)
+  maxIdle: 10,                  // Số kết nối rảnh rỗi tối đa
   ssl: {
     minVersion: 'TLSv1.2',
     rejectUnauthorized: true

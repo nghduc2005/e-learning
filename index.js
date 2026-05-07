@@ -57,10 +57,20 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   const status = err.status || err.statusCode || 500;
+  const message = err.message || 'Đã xảy ra lỗi hệ thống';
+
+  // Nếu là yêu cầu AJAX (chấp nhận JSON), trả về JSON thay vì render HTML
+  if (req.xhr || (req.headers.accept && req.headers.accept.includes('application/json'))) {
+    return res.status(status).json({
+      success: false,
+      message: message
+    });
+  }
+
   if (status === 403) {
     return res.status(403).render('errors/403', { layout: false });
   }
-  res.status(status).render('errors/500', { layout: false, message: err.message });
+  res.status(status).render('errors/500', { layout: false, message: message });
 });
 
 app.listen(port, () => {

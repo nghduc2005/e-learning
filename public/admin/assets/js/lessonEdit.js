@@ -226,10 +226,17 @@ validation
             validator: (value, fields) => {
                 const fileInput = document.getElementById('content');
                 const file = fileInput.files[0];
-                if (!file) return true; // file không bắt buộc khi cập nhật
+                const mode = document.getElementById('learnMode').value;
+                const initialMode = document.getElementById('learnMode').getAttribute('data-initial-mode');
+
+                if (!file) {
+                    if (initialMode && mode !== initialMode) {
+                        return false; // Bắt buộc up file mới nếu đổi chế độ học
+                    }
+                    return true; // Không đổi chế độ học thì không cần up file mới
+                }
 
                 const extension = file.name.split('.').pop().toLowerCase();
-                const mode = document.getElementById('learnMode').value;
 
                 if (mode === 'video') {
                     const videoExtensions = ['mp4', 'webm', 'mov'];
@@ -242,7 +249,7 @@ validation
                 }
                 return false;
             },
-            errorMessage: 'File không tồn tại hoặc không đúng theo định dạng/dung lượng khuyến nghị!',
+            errorMessage: 'Hình thức học đã thay đổi, vui lòng chọn file mới đúng định dạng (Video: mp4, webm | Bài viết: pdf, docx) hoặc file không đúng định dạng/dung lượng!',
         }
     ])
     .addField('#score', [
@@ -306,10 +313,12 @@ validation
               }
           })
           if (response.data.redirectUrl) {
-              if (window.opener) { window.close(); } else { window.history.back(); }
+              if (window.opener) { window.close(); } else { window.location.href = response.data.redirectUrl || document.referrer; }
           }
       } catch (error) {
-          console.log(error.response?.data || error);
+          console.error('Lỗi khi cập nhật bài học:', error);
+          const errorMsg = error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại!';
+          alert('Lỗi: ' + errorMsg);
       } finally {
           if(loadingOverlay) loadingOverlay.classList.add('hidden');
       }

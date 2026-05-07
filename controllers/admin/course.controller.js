@@ -1,6 +1,8 @@
 import { courseService } from "../../services/course.service.js";
 import curriculumService from "../../services/curriculum.service.js";
+import { lessonService } from "../../services/lesson.service.js";
 import reviewService from "../../services/review.service.js";
+import { unitService } from "../../services/unit.service.js";
 import logAction from "../../utils/auditLogger.js";
 
 export const courseController = {
@@ -67,7 +69,7 @@ export const courseController = {
   edit: async (req, res) => {
     try {
       const id = req.params.id;
-      const course = await courseService.getCourseById(id);
+      const course = await courseService.getRawCourseById(id);
 
       if (!course) {
         return res.redirect("/admin/course/list");
@@ -83,10 +85,23 @@ export const courseController = {
     }
   },
 
-  curriculum: (req, res) => {
-    res.render("admin/curriculum", {
-      title: "Chương trình học"
-    })
+  curriculum: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const course = await courseService.getCourseById(id);
+      
+      if (!course) {
+        return res.redirect("/admin/course/list");
+      }
+
+      res.render("admin/curriculum", {
+        title: `Chương trình học – ${course.name}`,
+        course: course
+      });
+    } catch (error) {
+      console.error("Lỗi trang Curriculum:", error);
+      res.redirect("/admin/course/list");
+    }
   },
 
   createPost: async (req, res) => {
@@ -104,10 +119,13 @@ export const courseController = {
 
       await logAction(req.session.admin?.id, 'create_course', `Tạo khóa học: ${req.body.title}`);
 
+      req.session.flash = { type: 'success', message: 'Tạo khóa học thành công!' };
+
       res.json({
         data: {
           ok: 1,
-          message: "Tạo khóa học thành công!"
+          message: "Tạo khóa học thành công!",
+          redirectUrl: "/admin/course/list"
         }
       });
     } catch (error) {
@@ -134,10 +152,13 @@ export const courseController = {
 
       await logAction(req.session.admin?.id, 'update_course', `Cập nhật khóa học: ${req.body.title}`);
 
+      req.session.flash = { type: 'success', message: 'Cập nhật khóa học thành công!' };
+
       res.json({
         data: {
           ok: 1,
-          message: "Cập nhật khóa học thành công!"
+          message: "Cập nhật khóa học thành công!",
+          redirectUrl: "/admin/course/list"
         }
       });
     } catch (error) {
@@ -155,6 +176,8 @@ export const courseController = {
 
       await logAction(req.session.admin?.id, 'delete_course', `Xóa khóa học #${id}`);
 
+      req.session.flash = { type: 'success', message: 'Xóa khóa học thành công!' };
+
       const backURL = req.header('Referer') || '/admin/course/list';
       res.redirect(backURL);
     } catch (error) {
@@ -170,6 +193,8 @@ export const courseController = {
 
       await logAction(req.session.admin?.id, 'restore_course', `Khôi phục khóa học #${id}`);
 
+      req.session.flash = { type: 'success', message: 'Khôi phục khóa học thành công!' };
+
       const backURL = req.header('Referer') || '/admin/course/trash';
       res.redirect(backURL);
     } catch (error) {
@@ -180,7 +205,7 @@ export const courseController = {
 
   getUnits: async (req, res) => {
     try {
-      const units = await courseService.getAllUnits();
+      const units = await unitService.getAllUnits();
       res.json(units);
     } catch (error) {
       console.error("Error fetching units:", error);
@@ -190,7 +215,7 @@ export const courseController = {
 
   getLessons: async (req, res) => {
     try {
-      const lessons = await courseService.getAllLessons();
+      const lessons = await lessonService.getAllLessons();
       res.json(lessons);
     } catch (error) {
       console.error("Error fetching lessons:", error);
